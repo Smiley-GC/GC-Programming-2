@@ -68,34 +68,52 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            CreateProjectile(direction, projectileSpeed * 2.0f);
+            switch (weaponType)
+            {
+                case WeaponType.RIFLE:
+                    CreateRifle(direction, projectileSpeed);
+                    break;
+
+                case WeaponType.SHOTGUN:
+                    CreateShotgun(direction, projectileSpeed);
+                    break;
+
+                case WeaponType.GRENADE:
+                    CreateGrenade(direction, projectileSpeed);
+                    break;
+            }
         }
 
         transform.position += velocity * moveSpeed * dt;
     }
 
-    GameObject CreateProjectile(Vector3 direction, float speed)
+    GameObject CreateProjectile(Vector3 direction, float speed, Color color)
     {
         GameObject projectile = Instantiate(projectilePrefab);
         projectile.transform.position = transform.position + direction;
         projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
-
-        SpriteRenderer spriteRenderer = projectile.GetComponent<SpriteRenderer>();
-        switch (weaponType)
-        {
-            case WeaponType.RIFLE:
-                spriteRenderer.color = Color.red;
-                break;
-
-            case WeaponType.SHOTGUN:
-                spriteRenderer.color = Color.green;
-                break;
-
-            case WeaponType.GRENADE:
-                spriteRenderer.color = Color.blue;
-                break;
-        }
+        projectile.GetComponent<SpriteRenderer>().color = color;
         return projectile;
+    }
+
+    GameObject CreateRifle(Vector3 direction, float speed)
+    {
+        GameObject rifle = CreateProjectile(direction, speed, Color.red);
+        return rifle;
+    }
+
+    GameObject CreateShotgun(Vector3 direction, float speed)
+    {
+        CreateProjectile(direction, speed, Color.green);
+        CreateProjectile(Quaternion.Euler(0.0f, 0.0f,  30.0f) * direction, speed, Color.green);
+        CreateProjectile(Quaternion.Euler(0.0f, 0.0f, -30.0f) * direction, speed, Color.green);
+        return null;
+    }
+
+    GameObject CreateGrenade(Vector3 direction, float speed)
+    {
+        GameObject grenade = CreateProjectile(direction, speed, Color.blue);
+        return grenade;
     }
 
     void OnTriggerEnter2D(Collider2D collision)
