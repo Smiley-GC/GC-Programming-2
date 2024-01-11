@@ -2,9 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum WeaponType
+{
+    RIFLE,
+    SHOTGUN,
+    GRENADE
+}
+
 public class Player : MonoBehaviour
 {
     public GameObject projectilePrefab;
+    WeaponType weaponType = WeaponType.RIFLE;
+
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
     float projectileSpeed = 5.0f;
@@ -70,6 +79,39 @@ public class Player : MonoBehaviour
         GameObject projectile = Instantiate(projectilePrefab);
         projectile.transform.position = transform.position + direction;
         projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
+
+        SpriteRenderer spriteRenderer = projectile.GetComponent<SpriteRenderer>();
+        switch (weaponType)
+        {
+            case WeaponType.RIFLE:
+                spriteRenderer.color = Color.red;
+                break;
+
+            case WeaponType.SHOTGUN:
+                spriteRenderer.color = Color.green;
+                break;
+
+            case WeaponType.GRENADE:
+                spriteRenderer.color = Color.blue;
+                break;
+        }
         return projectile;
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log(collision.name);
+        if (collision.CompareTag("Rifle"))
+        {
+            weaponType = WeaponType.RIFLE;
+        }
+        else if (collision.CompareTag("Shotgun"))
+        {
+            weaponType = WeaponType.SHOTGUN;
+        }
+        else if (collision.CompareTag("Grenade"))
+        {
+            weaponType = WeaponType.GRENADE;
+        }
     }
 }
