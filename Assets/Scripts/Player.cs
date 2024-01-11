@@ -4,14 +4,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    //Rigidbody2D rb;
+    public GameObject projectilePrefab;
     float moveSpeed = 10.0f;    // Move at 10 units per second
-    float turnSpeed = 360.0f;   // Turn at 360 degrees per second
-
-    void Start()
-    {
-        //rb = GetComponent<Rigidbody2D>();
-    }
+    float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
+    float projectileSpeed = 5.0f;
 
     void Update()
     {
@@ -61,6 +57,19 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            CreateProjectile(direction, projectileSpeed * 2.0f);
+        }
+
         transform.position += velocity * moveSpeed * dt;
+    }
+
+    GameObject CreateProjectile(Vector3 direction, float speed)
+    {
+        GameObject projectile = Instantiate(projectilePrefab);
+        projectile.transform.position = transform.position + direction;
+        projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
+        return projectile;
     }
 }
