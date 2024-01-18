@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
         // A vector represents a direction.
         // We get our direction vector by taking whatever direction we want a rotation of 0 to be (Vector3.right in this case),
         // and multiply it by our transfor's rotation which is a quaternion.
-        Vector3 direction = transform.rotation * Vector3.right;
+        Vector3 direction = transform.right;//transform.rotation * Vector3.right;
 
         // We can use trigonometry to convert directions to angles and angles to directions
         // (This is unnecessary for the actual implementation, just review)
@@ -96,24 +96,23 @@ public class Player : MonoBehaviour
         return projectile;
     }
 
-    GameObject CreateRifle(Vector3 direction, float speed)
+    void CreateRifle(Vector3 direction, float speed)
     {
-        GameObject rifle = CreateProjectile(direction, speed, Color.red);
-        return rifle;
+        CreateProjectile(direction, speed, Color.red);
     }
 
-    GameObject CreateShotgun(Vector3 direction, float speed)
+    void CreateShotgun(Vector3 direction, float speed)
     {
         CreateProjectile(direction, speed, Color.green);
         CreateProjectile(Quaternion.Euler(0.0f, 0.0f,  30.0f) * direction, speed, Color.green);
         CreateProjectile(Quaternion.Euler(0.0f, 0.0f, -30.0f) * direction, speed, Color.green);
-        return null;
     }
 
-    GameObject CreateGrenade(Vector3 direction, float speed)
+    void CreateGrenade(Vector3 direction, float speed)
     {
-        GameObject grenade = CreateProjectile(direction, speed, Color.blue);
-        return grenade;
+        GameObject explosion = CreateProjectile(direction, speed, Color.blue);
+        explosion.GetComponent<Explosion>().weaponType = weaponType;
+        Destroy(explosion, 1.0f);
     }
 
     void OnTriggerEnter2D(Collider2D collision)
