@@ -87,6 +87,9 @@ public class Player : MonoBehaviour
         transform.position += velocity * moveSpeed * dt;
     }
 
+    // Homework 1 hint: take each weapon-specific function and add it to each weapon-specific class
+    // Ensure you use polymorphism by making the base Weapon class have a virtual Fire() method,
+    // and overriding it with weapon-specific functionality!
     GameObject CreateProjectile(Vector3 direction, float speed, Color color)
     {
         GameObject projectile = Instantiate(projectilePrefab);
@@ -115,6 +118,7 @@ public class Player : MonoBehaviour
         Destroy(explosion, 1.0f);
     }
 
+    // Homework 1 hint: change weapon in here (weaponType is no longer necessary)
     void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log(collision.name);
