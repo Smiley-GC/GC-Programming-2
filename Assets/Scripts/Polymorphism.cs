@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class Animal
 {
+    public int instinct;
     // virtual allows dynamic lookup with a base implementation
     // abstract forces dynamic lookip without a base implementation
     public abstract void MakeSound();
@@ -13,7 +14,8 @@ public class Dog : Animal
 {
     public override void MakeSound()
     {
-        Debug.Log("WOOF!");
+        // Even though we defined insticnt in Animal, since Dog derives from Animal, it also has instinct!
+        Debug.Log("Hi I'm Scooby Doo and my master Shaggy has an instinct of " + instinct);
     }
 
     public void Growl()
@@ -93,6 +95,11 @@ public class Polymorphism : MonoBehaviour
         Animal cat = new Cat();
         dog.MakeSound();
         cat.MakeSound();
+
+        // Press F12 on these to see the different layers of inheritance that MonoBehaviour has!
+        IsInvoking();
+        Debug.Log(enabled);
+        Debug.Log(name);
 
         // Homework hint:
         // We can only have 1 weapon at a time, so you'll want to create a Weapon object
