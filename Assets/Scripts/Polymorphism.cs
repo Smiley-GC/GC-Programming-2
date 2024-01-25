@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Animal
+public abstract class Animal
 {
-    public virtual void MakeSound()
-    {
-        Debug.Log("Generic animal sound");
-    }
+    // virtual allows dynamic lookup with a base implementation
+    // abstract forces dynamic lookip without a base implementation
+    public abstract void MakeSound();
 }
 
 public class Dog : Animal
@@ -15,6 +14,11 @@ public class Dog : Animal
     public override void MakeSound()
     {
         Debug.Log("WOOF!");
+    }
+
+    public void Growl()
+    {
+        Debug.Log("Grrrrrrrrrr");
     }
 }
 
@@ -49,12 +53,65 @@ public class Fox : Animal
 // 1 mark for overall completeness (5% of your grade total).
 public class Polymorphism : MonoBehaviour
 {
+    public enum AnimalType
+    {
+        DOG,
+        CAT,
+        COW,
+        FOX
+    }
+
+    public void MakeSound(AnimalType type)
+    {
+        switch (type)
+        {
+            case AnimalType.DOG:
+                Debug.Log("WOOF!");
+                break;
+        
+            case AnimalType.CAT:
+                Debug.Log("Meow");
+                break;
+        
+            case AnimalType.COW:
+                Debug.Log("Moooooooooo");
+                break;
+        
+            case AnimalType.FOX:
+                Debug.Log("*Confusion intensifies*");
+                break;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        Animal[] animals = { new Dog(), new Cat(), new Cow(), new Fox() };
-        for (int i = 0; i < animals.Length; i++)
-            animals[i].MakeSound();
+        // Objects interpreted as Animal can only have behaviour common to all animals.
+        // (Only the Dog can growl but since dog is an Animal, dog.Growl() is an error).
+        //dog.Growl();
+        Animal dog = new Dog();
+        Animal cat = new Cat();
+        dog.MakeSound();
+        cat.MakeSound();
+
+        // Homework hint:
+        // We can only have 1 weapon at a time, so you'll want to create a Weapon object
+        // and then switch it based on the collider tag. For example:
+        // if rile, weapon = new Rifle
+        // if shotgun, weapon = new Shotgun
+        // if grenade, weapon = new Grenade
+
+        Dog actualDog = new Dog();
+        actualDog.Growl();
+
+        // When we use dynamic lookup (virtual, abstract, override) keywords,
+        // the compiler switches through the types automatically.
+        AnimalType manualDog = AnimalType.DOG;
+        MakeSound(manualDog);
+
+        //Animal[] animals = { new Dog(), new Cat(), new Cow(), new Fox() };
+        //for (int i = 0; i < animals.Length; i++)
+        //    animals[i].MakeSound();
     }
 
     // Update is called once per frame
