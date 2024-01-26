@@ -12,11 +12,17 @@ public enum WeaponType
 public class Player : MonoBehaviour
 {
     public GameObject projectilePrefab;
-    WeaponType weaponType = WeaponType.RIFLE;
+    Weapon weapon;
 
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
     float projectileSpeed = 5.0f;
+
+    void Start()
+    {
+        weapon = new Rifle();
+        weapon.prefab = projectilePrefab;
+    }
 
     void Update()
     {
@@ -68,28 +74,14 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            switch (weaponType)
-            {
-                case WeaponType.RIFLE:
-                    CreateRifle(direction, projectileSpeed);
-                    break;
-
-                case WeaponType.SHOTGUN:
-                    CreateShotgun(direction, projectileSpeed);
-                    break;
-
-                case WeaponType.GRENADE:
-                    CreateGrenade(direction, projectileSpeed);
-                    break;
-            }
+            // TODO -- replace these with the correct values
+            weapon.Fire(Vector3.zero, Vector3.right);
         }
 
         transform.position += velocity * moveSpeed * dt;
     }
 
-    // Homework 1 hint: take each weapon-specific function and add it to each weapon-specific class
-    // Ensure you use polymorphism by making the base Weapon class have a virtual Fire() method,
-    // and overriding it with weapon-specific functionality!
+    // Homework hint: this probably belongs in the base class (Weapon)
     GameObject CreateProjectile(Vector3 direction, float speed, Color color)
     {
         GameObject projectile = Instantiate(projectilePrefab);
@@ -114,25 +106,27 @@ public class Player : MonoBehaviour
     void CreateGrenade(Vector3 direction, float speed)
     {
         GameObject explosion = CreateProjectile(direction, speed, Color.blue);
-        explosion.GetComponent<Explosion>().weaponType = weaponType;
+        explosion.GetComponent<Explosion>().weaponType = WeaponType.GRENADE;
         Destroy(explosion, 1.0f);
     }
 
-    // Homework 1 hint: change weapon in here (weaponType is no longer necessary)
     void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log(collision.name);
         if (collision.CompareTag("Rifle"))
         {
-            weaponType = WeaponType.RIFLE;
+            weapon = new Rifle();
         }
         else if (collision.CompareTag("Shotgun"))
         {
-            weaponType = WeaponType.SHOTGUN;
+            weapon = new Shotgun();
         }
         else if (collision.CompareTag("Grenade"))
         {
-            weaponType = WeaponType.GRENADE;
+            weapon = new Grenade();
         }
+
+        // Whenever we overwrite our weapon we have to assign it a prefab
+        weapon.prefab = projectilePrefab;
     }
 }
