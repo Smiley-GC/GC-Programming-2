@@ -15,6 +15,16 @@ public abstract class Weapon
     public float rateOfFire;
 
     public abstract void Fire(Vector3 position, Vector3 direction);
+
+    // protected means visible in derived classes, but not externally (ie player can't do weapon.CreateProjectile)
+    protected GameObject CreateProjectile(Vector3 position, Vector3 direction)
+    {
+        GameObject projectile = Object.Instantiate(prefab);
+        projectile.transform.position = position + direction;
+        projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
+        projectile.GetComponent<SpriteRenderer>().color = color;
+        return projectile;
+    }
 }
 
 public class Rifle : Weapon
@@ -22,6 +32,7 @@ public class Rifle : Weapon
     // Rifle constructor. Defines rifle-specific values
     public Rifle()
     {
+        speed = 10.0f;
         color = Color.red;
         amoCount = 35;
         rateOfFire = 420.0f;
@@ -29,7 +40,7 @@ public class Rifle : Weapon
 
     public override void Fire(Vector3 position, Vector3 direction)
     {
-        Debug.Log("Fired rifle");
+        CreateProjectile(position, direction);
     }
 }
 
@@ -38,6 +49,7 @@ public class Shotgun : Weapon
     // Shotgun constructor. Defines shotgun-specific values
     public Shotgun()
     {
+        speed = 5.0f;
         color = Color.green;
         amoCount = 5;
         rateOfFire = 15.0f;
@@ -45,7 +57,13 @@ public class Shotgun : Weapon
 
     public override void Fire(Vector3 position, Vector3 direction)
     {
-        Debug.Log("Fired shotgun");
+        Vector3 forward = direction;
+        Vector3 left = Quaternion.Euler(0.0f, 0.0f, 30.0f) * direction;
+        Vector3 right = Quaternion.Euler(0.0f, 0.0f, -30.0f) * direction;
+
+        CreateProjectile(position, forward);
+        CreateProjectile(position, left);
+        CreateProjectile(position, right);
     }
 }
 
@@ -54,6 +72,7 @@ public class Grenade : Weapon
     // Grenade constructor. Defines grenade-specific values
     public Grenade()
     {
+        speed = 2.5f;
         color = Color.blue;
         amoCount = 3;
         rateOfFire = 69.0f;
@@ -61,6 +80,8 @@ public class Grenade : Weapon
 
     public override void Fire(Vector3 position, Vector3 direction)
     {
-        Debug.Log("Fired grenade");
+        GameObject explosion = CreateProjectile(position, direction);
+        explosion.GetComponent<Explosion>().weaponType = WeaponType.GRENADE;
+        Object.Destroy(explosion, 1.0f);
     }
 }

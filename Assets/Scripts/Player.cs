@@ -16,7 +16,6 @@ public class Player : MonoBehaviour
 
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
-    float projectileSpeed = 5.0f;
 
     void Update()
     {
@@ -32,20 +31,9 @@ public class Player : MonoBehaviour
             transform.Rotate(0.0f, 0.0f, turnSpeed * dt);
         }
 
-        // A quaternion represents a rotation.
-        // A vector represents a direction.
-        // We get our direction vector by taking whatever direction we want a rotation of 0 to be (Vector3.right in this case),
-        // and multiply it by our transfor's rotation which is a quaternion.
-        Vector3 direction = transform.right;//transform.rotation * Vector3.right;
-
-        // We can use trigonometry to convert directions to angles and angles to directions
-        // (This is unnecessary for the actual implementation, just review)
-        //float angle = Mathf.Atan2(direction.y, direction.x);
-        //direction = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle));
-        //Debug.Log(angle * Mathf.Rad2Deg);
-        Debug.DrawLine(transform.position, transform.position + direction * 10.0f);
-
+        Debug.DrawLine(transform.position, transform.position + transform.right * 10.0f);
         Vector3 velocity = Vector3.zero;
+
         if (Input.GetKey(KeyCode.W))
         {
             velocity += transform.right;
@@ -74,38 +62,6 @@ public class Player : MonoBehaviour
         transform.position += velocity * moveSpeed * dt;
     }
 
-    // Homework 1 hint: take each weapon-specific function and add it to each weapon-specific class
-    // Ensure you use polymorphism by making the base Weapon class have a virtual Fire() method,
-    // and overriding it with weapon-specific functionality!
-    GameObject CreateProjectile(Vector3 direction, float speed, Color color)
-    {
-        GameObject projectile = Instantiate(projectilePrefab);
-        projectile.transform.position = transform.position + direction;
-        projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
-        projectile.GetComponent<SpriteRenderer>().color = color;
-        return projectile;
-    }
-
-    void CreateRifle(Vector3 direction, float speed)
-    {
-        CreateProjectile(direction, speed, Color.red);
-    }
-
-    void CreateShotgun(Vector3 direction, float speed)
-    {
-        CreateProjectile(direction, speed, Color.green);
-        CreateProjectile(Quaternion.Euler(0.0f, 0.0f,  30.0f) * direction, speed, Color.green);
-        CreateProjectile(Quaternion.Euler(0.0f, 0.0f, -30.0f) * direction, speed, Color.green);
-    }
-
-    void CreateGrenade(Vector3 direction, float speed)
-    {
-        GameObject explosion = CreateProjectile(direction, speed, Color.blue);
-        explosion.GetComponent<Explosion>().weaponType = WeaponType.GRENADE;
-        Destroy(explosion, 1.0f);
-    }
-
-    // Homework 1 hint: change weapon in here (weaponType is no longer necessary)
     void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log(collision.name);
