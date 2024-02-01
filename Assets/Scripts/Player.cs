@@ -12,7 +12,7 @@ public enum WeaponType
 public class Player : MonoBehaviour
 {
     public GameObject projectilePrefab;
-    WeaponType weaponType = WeaponType.RIFLE;
+    Weapon weapon = null;
 
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
@@ -66,22 +66,9 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && weapon != null)
         {
-            switch (weaponType)
-            {
-                case WeaponType.RIFLE:
-                    CreateRifle(direction, projectileSpeed);
-                    break;
-
-                case WeaponType.SHOTGUN:
-                    CreateShotgun(direction, projectileSpeed);
-                    break;
-
-                case WeaponType.GRENADE:
-                    CreateGrenade(direction, projectileSpeed);
-                    break;
-            }
+            weapon.Fire(transform.position + transform.right, transform.right);
         }
 
         transform.position += velocity * moveSpeed * dt;
@@ -114,7 +101,7 @@ public class Player : MonoBehaviour
     void CreateGrenade(Vector3 direction, float speed)
     {
         GameObject explosion = CreateProjectile(direction, speed, Color.blue);
-        explosion.GetComponent<Explosion>().weaponType = weaponType;
+        explosion.GetComponent<Explosion>().weaponType = WeaponType.GRENADE;
         Destroy(explosion, 1.0f);
     }
 
@@ -124,15 +111,16 @@ public class Player : MonoBehaviour
         Debug.Log(collision.name);
         if (collision.CompareTag("Rifle"))
         {
-            weaponType = WeaponType.RIFLE;
+            weapon = new Rifle();
         }
         else if (collision.CompareTag("Shotgun"))
         {
-            weaponType = WeaponType.SHOTGUN;
+            weapon = new Shotgun();
         }
         else if (collision.CompareTag("Grenade"))
         {
-            weaponType = WeaponType.GRENADE;
+            weapon = new Grenade();
         }
+        weapon.prefab = projectilePrefab;
     }
 }

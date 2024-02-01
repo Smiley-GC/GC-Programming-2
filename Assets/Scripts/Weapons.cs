@@ -14,7 +14,7 @@ public abstract class Weapon
     public int amoCount;
     public float rateOfFire;
 
-    public abstract void Fire(Vector3 direction);
+    public abstract void Fire(Vector3 position, Vector3 direction);
 }
 
 public class Rifle : Weapon
@@ -27,9 +27,9 @@ public class Rifle : Weapon
         rateOfFire = 420.0f;
     }
 
-    public override void Fire(Vector3 direction)
+    public override void Fire(Vector3 position, Vector3 direction)
     {
-        
+        Debug.Log("Fired rifle");
     }
 }
 
@@ -43,9 +43,9 @@ public class Shotgun : Weapon
         rateOfFire = 15.0f;
     }
 
-    public override void Fire(Vector3 direction)
+    public override void Fire(Vector3 position, Vector3 direction)
     {
-
+        Debug.Log("Fired shotgun");
     }
 }
 
@@ -59,8 +59,8 @@ public class Grenade : Weapon
         rateOfFire = 69.0f;
     }
 
-    public override void Fire(Vector3 direction)
+    public override void Fire(Vector3 position, Vector3 direction)
     {
-
+        Debug.Log("Fired grenade");
     }
 }
