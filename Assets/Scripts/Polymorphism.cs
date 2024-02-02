@@ -114,22 +114,41 @@ public class Fox : Animal
     }
 }
 
-// Example of when public can cause problems
-public class Box
+public abstract class Shape
 {
-    public float Area()
+    public abstract float Area();
+}
+
+public class Rectangle : Shape
+{
+    public override float Area()
     {
-        // Assume this is actually a very expensive calculation
-        area = width * height;
-        return area;
+        return width * height;
     }
 
-    // We're storing area as a variable to cache this "oh so expensive" width * height calculation
-    // We don't want the user to be able to change area extenally.
-    // It should only be updated when we call the Area() function.
-    // Hence, we should make it private to prevent misuse!
-    private float area;
-    public float width, height;
+    public float width;
+    public float height;
+}
+
+public class Triangle : Shape
+{
+    public override float Area()
+    {
+        return (width * height) / 2.0f;
+    }
+
+    public float width;
+    public float height;
+}
+
+public class Circle : Shape
+{
+    public override float Area()
+    {
+        return 2.0f * Mathf.PI * radius;
+    }
+
+    public float radius;
 }
 
 // Homework: Using polymorphism, modify the final exam solution so
@@ -195,6 +214,27 @@ public class Polymorphism : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Not currently polymorphic since all shapes are unique types (ie Rectangle instead of Shape)
+        // Only use polymorphism if you actually NEED automation
+        Rectangle rectangle = new Rectangle();
+        Triangle triangle = new Triangle();
+        Circle circle = new Circle();
+
+        rectangle.width = triangle.width = 100.0f;
+        rectangle.height = triangle.height = 50.0f;
+        circle.radius = 25.0f;
+
+        Debug.Log(rectangle.Area());
+        Debug.Log(triangle.Area());
+        Debug.Log(circle.Area());
+
+        // "Polymorphism is automation"
+        // Only by looping through a collection of generic objects do we achieve polymorphism
+        // ("Same thing [shape], different behaviours [shape-specific Area()])
+        Shape[] shapes = { rectangle, triangle, circle };
+        for (int i = 0; i < shapes.Length; i++)
+            Debug.Log(shapes[i].Area());
+
         Test test = new Test();
         Debug.Log(test.value);
         ChangeTest(test);
@@ -204,13 +244,6 @@ public class Polymorphism : MonoBehaviour
         Debug.Log("Color before: " + color);
         ChangeColor(ref color);
         Debug.Log("Color after: " + color);
-
-        Box box = new Box();
-        box.width = 10.0f;
-        box.height = 20.0f;
-        Debug.Log(box.width);
-        Debug.Log(box.height);
-        Debug.Log(box.Area());
 
         // This becomes a compiler error once we make Animal an abstract class
         //Animal anmimal = new Animal();
