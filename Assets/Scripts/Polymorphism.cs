@@ -169,9 +169,26 @@ public class Polymorphism : MonoBehaviour
         }
     }
 
+    // Passes color "by value" (copy of the variable)
+    void ChangeColor(Color color)
+    {
+        color = Color.green;
+    }
+
+    // Passes color "by reference" (actual variable)
+    void ChangeColor(ref Color color)
+    {
+        color = Color.green;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        Color color = Color.red;
+        Debug.Log("Color before: " + color);
+        ChangeColor(ref color);
+        Debug.Log("Color after: " + color);
+
         Box box = new Box();
         box.width = 10.0f;
         box.height = 20.0f;
