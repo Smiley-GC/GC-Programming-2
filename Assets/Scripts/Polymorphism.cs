@@ -181,9 +181,25 @@ public class Polymorphism : MonoBehaviour
         color = Color.green;
     }
 
+    public class Test
+    {
+        public int value;
+    }
+
+    // Classes are automatically passed by reference (you don't need the ref keyword)
+    void ChangeTest(Test test)
+    {
+        test.value = 1;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        Test test = new Test();
+        Debug.Log(test.value);
+        ChangeTest(test);
+        Debug.Log(test.value);
+
         Color color = Color.red;
         Debug.Log("Color before: " + color);
         ChangeColor(ref color);
