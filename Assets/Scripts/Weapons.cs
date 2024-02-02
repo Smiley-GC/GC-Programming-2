@@ -17,6 +17,19 @@ public abstract class Weapon
 
     // All weapons should have their own Fire() method, so base class is abstract!
     public abstract void Fire(Vector3 position, Vector3 direction);
+
+    // protected means this is visible in derived classes but not externally
+    // ie Player.cs cannot invoke CreateProjectile()
+    protected GameObject CreateProjectile(Vector3 position, Vector3 direction)
+    {
+        // Instantiate is a static method of Object
+        // Static methods allow you to call a function without having an instance of an object
+        GameObject projectile = Object.Instantiate(prefab);
+        projectile.transform.position = position + direction;
+        projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
+        projectile.GetComponent<SpriteRenderer>().color = color;
+        return projectile;
+    }
 }
 
 public class Rifle : Weapon
@@ -29,10 +42,7 @@ public class Rifle : Weapon
 
     public override void Fire(Vector3 position, Vector3 direction)
     {
-        GameObject projectile = Object.Instantiate(prefab);
-        projectile.transform.position = position;
-
-        Debug.Log("Fired rifle");
+        CreateProjectile(position, direction);
     }
 }
 
@@ -46,7 +56,13 @@ public class Shotgun : Weapon
 
     public override void Fire(Vector3 position, Vector3 direction)
     {
-        Debug.Log("Fired shotugn");
+        Vector3 forward = direction;
+        Vector3 left = Quaternion.Euler(new Vector3(0.0f, 0.0f, 30.0f)) * forward;
+        Vector3 right = Quaternion.Euler(new Vector3(0.0f, 0.0f, -30.0f)) * forward;
+
+        CreateProjectile(position, forward);
+        CreateProjectile(position, left);
+        CreateProjectile(position, right);
     }
 }
 
@@ -60,6 +76,8 @@ public class Grenade : Weapon
 
     public override void Fire(Vector3 position, Vector3 direction)
     {
-        Debug.Log("Fired grenade");
+        GameObject explosion = CreateProjectile(position, direction);
+        explosion.GetComponent<Explosion>().weaponType = WeaponType.GRENADE;
+        Object.Destroy(explosion, 1.0f);
     }
 }
