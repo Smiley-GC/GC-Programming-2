@@ -114,9 +114,17 @@ public class Fox : Animal
     }
 }
 
+// abstract prevents the class from being instantiated
 public abstract class Shape
 {
+    // Prefer abstract when we want a specific implementation
     public abstract float Area();
+
+    // Prefer virtual when we want a fallback implementation
+    public virtual string Name()
+    {
+        return "unnamed shape";
+    }
 }
 
 public class Rectangle : Shape
@@ -124,6 +132,11 @@ public class Rectangle : Shape
     public override float Area()
     {
         return width * height;
+    }
+
+    public override string Name()
+    {
+        return "SIR DONALD J. TRUMP the rectangle";
     }
 
     public float width;
@@ -135,6 +148,11 @@ public class Triangle : Shape
     public override float Area()
     {
         return (width * height) / 2.0f;
+    }
+
+    public override string Name()
+    {
+        return "JOE BIDEN the triangle";
     }
 
     public float width;
@@ -221,7 +239,7 @@ public class Polymorphism : MonoBehaviour
         Circle circle = new Circle();
 
         rectangle.width = triangle.width = 100.0f;
-        rectangle.height = triangle.height = 50.0f;
+        rectangle.height = triangle.height = 100.0f;
         circle.radius = 25.0f;
 
         Debug.Log(rectangle.Area());
@@ -233,7 +251,7 @@ public class Polymorphism : MonoBehaviour
         // ("Same thing [shape], different behaviours [shape-specific Area()])
         Shape[] shapes = { rectangle, triangle, circle };
         for (int i = 0; i < shapes.Length; i++)
-            Debug.Log(shapes[i].Area());
+            Debug.Log("Shape " + shapes[i].Name() + " has area " + shapes[i].Area());
 
         Test test = new Test();
         Debug.Log(test.value);
