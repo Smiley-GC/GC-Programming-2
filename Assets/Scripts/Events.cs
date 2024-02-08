@@ -12,9 +12,7 @@ public class Events : MonoBehaviour
         DIV
     }
 
-    MathType type;
-
-    float MathOperation(float a, float b)
+    float MathOperation(float a, float b, MathType type)
     {
         switch (type)
         {
@@ -40,17 +38,17 @@ public class Events : MonoBehaviour
         float b = 2.0f;
 
         // Way 1: old-school manual polymorphism (when in doubt, do this)
-        type = MathType.ADD;
-        Debug.Log(MathOperation(a, b));
+        MathType type = MathType.ADD;
+        Debug.Log(MathOperation(a, b, type));
 
         type = MathType.SUB;
-        Debug.Log(MathOperation(a, b));
+        Debug.Log(MathOperation(a, b, type));
 
         type = MathType.MUL;
-        Debug.Log(MathOperation(a, b));
+        Debug.Log(MathOperation(a, b, type));
 
         type = MathType.DIV;
-        Debug.Log(MathOperation(a, b));
+        Debug.Log(MathOperation(a, b, type));
 
         // Way 2: delegates ("function pointers" -- best when *behaviour-only*)
         mathOperation = Add;
@@ -79,6 +77,25 @@ public class Events : MonoBehaviour
 
         mathOp = new DivOp();
         Debug.Log(mathOp.Operation(a, b));
+
+        // Automate the above process -- use a for-loop and array to
+        // loop through math operations and call them
+
+        MathOp[] mathOps = { new AddOp(), new SubOp(), new MulOp(), new DivOp() };
+        for (int i = 0; i < mathOps.Length; i++)
+        {
+            Debug.Log(mathOps[i].Operation(a, b));
+        }
+
+        MathFunction[] mathOperations = { Add, Sub, Mul, Div };
+        for (int i = 0; i < mathOperations.Length; i++)
+            Debug.Log(mathOperations[i](a, b));
+
+        MathType[] operations = { MathType.ADD, MathType.SUB, MathType.MUL, MathType.DIV };
+        for (int i = 0; i < operations.Length; i++)
+        {
+            Debug.Log(MathOperation(a, b, operations[i]));
+        }
     }
 
     float Add(float a, float b)
