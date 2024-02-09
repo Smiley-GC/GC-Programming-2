@@ -2,6 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Base implementation will be Character
+// 4 Derived implementations -- Human, Elve, Orc, Undead
+// Using polymorphism, implement the derived class Attack behaviour for all 4 classes.
+
+public abstract class Character
+{
+    public virtual void Attack()
+    {
+        Debug.Log("*Intimidating noises*");
+    }
+}
+
+
 public abstract class Animal
 {
     // Default animal constructor
