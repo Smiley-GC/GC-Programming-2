@@ -27,6 +27,7 @@ public class Button : MonoBehaviour
     void Start()
     {
         onMouseIn = OnMouseIn;
+        onMouseOut = OnMouseOut;
     }
 
     bool collision = false;
@@ -47,6 +48,12 @@ public class Button : MonoBehaviour
             onMouseIn();
         }
 
+        // Handle mouse-out event
+        if (collision && !collisionThisFrame && onMouseOut != null)
+        {
+            onMouseOut();
+        }
+
         Color color = collision ? Color.red : Color.green;
         GetComponent<SpriteRenderer>().color = color;
 
@@ -60,7 +67,7 @@ public class Button : MonoBehaviour
 
     void OnMouseOut()
     {
-
+        Debug.Log("Mouse-out");
     }
 
     void OnMouseOverlap() 
