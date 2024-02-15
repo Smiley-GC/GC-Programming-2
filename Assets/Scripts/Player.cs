@@ -11,6 +11,9 @@ public enum WeaponType
 
 public class Player : MonoBehaviour
 {
+    float current = 0.0f;
+    float total = 0.25f;
+
     public GameObject projectilePrefab;
     Weapon weapon = null;
 
@@ -54,9 +57,17 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && weapon != null)
+
+        // Old approach where we spammed space to fire our weapon
+        //if (Input.GetKeyDown(KeyCode.Space) && weapon != null)
+
+        // New approach where we fire our weapon based on a timer
+        current += dt;
+        bool canFire = current >= total;
+        if (Input.GetKey(KeyCode.Space) && weapon != null && canFire)
         {
             weapon.Fire(transform.position + transform.right, transform.right);
+            current = 0.0f;
         }
 
         transform.position += velocity * moveSpeed * dt;
