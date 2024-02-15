@@ -28,6 +28,11 @@ public class Button : MonoBehaviour
     {
         onMouseIn = OnMouseIn;
         onMouseOut = OnMouseOut;
+        onMouseClick = OnMouseClick;
+
+        // If we want to avoid getting spam-logged when our cursor is over the button,
+        // simply comment-out this handler so nothing is dispatched on-mouse-over!
+        //onMouseOverlap = OnMouseOverlap;
     }
 
     bool collision = false;
@@ -54,6 +59,18 @@ public class Button : MonoBehaviour
             onMouseOut();
         }
 
+        // Handle mouse-over event
+        if (collisionThisFrame && onMouseOverlap != null)
+        {
+            onMouseOverlap();
+        }
+
+        // Handle mouse-click event
+        if (Input.GetMouseButtonDown(0) && collisionThisFrame && onMouseClick != null)
+        {
+            onMouseClick();
+        }
+
         Color color = collision ? Color.red : Color.green;
         GetComponent<SpriteRenderer>().color = color;
 
@@ -72,11 +89,11 @@ public class Button : MonoBehaviour
 
     void OnMouseOverlap() 
     {
-
+        Debug.Log("Mouse-over");
     }
 
     void OnMouseClick()
     {
-
+        Debug.Log("Mouse-click");
     }
 }
