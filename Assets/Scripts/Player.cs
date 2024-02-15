@@ -11,14 +11,19 @@ public enum WeaponType
 
 public class Player : MonoBehaviour
 {
-    float current = 0.0f;
-    float total = 0.25f;
+    Timer shootTimer = new Timer();
 
     public GameObject projectilePrefab;
     Weapon weapon = null;
 
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
+
+    void Start()
+    {
+        // Shoot our weapon every 0.5 seconds
+        shootTimer.total = 0.5f;
+    }
 
     void Update()
     {
@@ -57,17 +62,15 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
-
         // Old approach where we spammed space to fire our weapon
         //if (Input.GetKeyDown(KeyCode.Space) && weapon != null)
 
         // New approach where we fire our weapon based on a timer
-        current += dt;
-        bool canFire = current >= total;
-        if (Input.GetKey(KeyCode.Space) && weapon != null && canFire)
+        shootTimer.Tick(dt);
+        if (Input.GetKey(KeyCode.Space) && weapon != null && shootTimer.Expired())
         {
+            shootTimer.Reset();
             weapon.Fire(transform.position + transform.right, transform.right);
-            current = 0.0f;
         }
 
         transform.position += velocity * moveSpeed * dt;
