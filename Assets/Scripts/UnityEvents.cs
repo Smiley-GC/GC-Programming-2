@@ -1,7 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+
+public class PlayerDeathArgs : EventArgs
+{
+    public Vector3 deathPosition = Vector3.zero;
+}
 
 public class UnityEvents : MonoBehaviour
 {
@@ -10,13 +16,16 @@ public class UnityEvents : MonoBehaviour
 
     // We can type "using UnityEngine.Events;" at the top of the file to tell C# that we'd like to use the UnityEngine.Events namespace.
     // Otherwise, we'd have to write this variable as "UnityEngine.Events.UnityEvent onPlayerDeath;"
-    public UnityEvent onPlayerDeath;
+    public UnityEvent<PlayerDeathArgs> onPlayerDeath;
 
     // "Publishes" our player death event!
     void Die()
     {
+        PlayerDeathArgs args = new PlayerDeathArgs();
+        args.deathPosition = player.transform.position;
+
         // We use .Invoke() to publish (also refered to as "dispatch", or "broadcast") unity events!
-        onPlayerDeath.Invoke();
+        onPlayerDeath.Invoke(args);
     }
 
     void Start()
@@ -36,7 +45,7 @@ public class UnityEvents : MonoBehaviour
         }
     }
 
-    void OnDeathCounter()
+    void OnDeathCounter(PlayerDeathArgs args)
     {
         if (deathCount == 4)
         {
@@ -46,9 +55,10 @@ public class UnityEvents : MonoBehaviour
         Debug.Log("Death count: " + deathCount);
     }
 
-    void OnDeathRespawn()
+    void OnDeathRespawn(PlayerDeathArgs args)
     {
         player.transform.position = Vector3.right * -5.0f;
+        Debug.Log("Player died at location " + args.deathPosition);
         Debug.Log("Resetting player position to " + player.transform.position);
     }
 }
