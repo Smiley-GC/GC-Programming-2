@@ -14,11 +14,16 @@ public class Player : MonoBehaviour
     public GameObject projectilePrefab;
     Weapon weapon = null;
 
-    float current = 0.0f;
-    float total = 2.0f;    // fire weapon every 0.25 seconds
+    Timer weaponCooldown = new Timer();
 
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
+
+    void Start()
+    {
+        // Shoot every half-second
+        weaponCooldown.total = 0.5f;
+    }
 
     void Update()
     {
@@ -57,10 +62,10 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
-        current += dt;
-        if (Input.GetKey(KeyCode.Space) && weapon != null && current >= total)
+        weaponCooldown.Tick(dt);
+        if (Input.GetKey(KeyCode.Space) && weapon != null && weaponCooldown.Expired())
         {
-            current = 0.0f;
+            weaponCooldown.Reset();
             weapon.Fire(transform.position, transform.right);
         }
 
