@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     public GameObject projectilePrefab;
     Weapon weapon = null;
 
+    float current = 0.0f;
+    float total = 2.0f;    // fire weapon every 0.25 seconds
+
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
 
@@ -54,8 +57,10 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && weapon != null)
+        current += dt;
+        if (Input.GetKey(KeyCode.Space) && weapon != null && current >= total)
         {
+            current = 0.0f;
             weapon.Fire(transform.position, transform.right);
         }
 
