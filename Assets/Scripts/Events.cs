@@ -12,6 +12,8 @@ public class Events : MonoBehaviour
         public DamageHander damageAchievement;
         public DamageHander damageLogic;
         public DamageHander damageAudio;
+
+        public bool isEnemy;
     }
 
     public delegate void DamageHander(Entity entity);
@@ -29,6 +31,16 @@ public class Events : MonoBehaviour
 
         if (entity.damageAudio != null)
             entity.damageAudio(entity);
+    }
+
+    // *Only use design patterns if they ACTUALLY solve a problem*
+    // In this case its over-engineering to go to such lengths when we can house the same logic in the following function:
+    void Damage2(Entity entity)
+    {
+        DecreaseHealth(entity);
+        PlayAudio(entity);
+        if (!entity.isEnemy)
+            UnlockAchievement(entity);
     }
 
     // Start is called before the first frame update
