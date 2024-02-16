@@ -19,6 +19,9 @@ public class Button : MonoBehaviour
         return true;
     }
 
+    //delegate void MouseHandler();
+    bool collision = false;
+
     void Start()
     {
         
@@ -27,7 +30,41 @@ public class Button : MonoBehaviour
     void Update()
     {
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        bool collision = PointInRec(mouse, transform.position, 1.0f, 1.0f);
+        bool collisionThisFrame = PointInRec(mouse, transform.position, 1.0f, 1.0f);
         GetComponent<SpriteRenderer>().color = collision ? Color.red : Color.green;
+
+        // If we were previously outside the button, and now we're inside the button, dispatch the mouse-in event!
+        if (!collision && collisionThisFrame)
+        {
+            OnMouseIn();
+        }
+
+        // If we were previously inside the button, and we're outside the button, dispatch the mouse-out event!
+        if (collision && !collisionThisFrame)
+        {
+            OnMouseOut();
+        }
+
+        collision = collisionThisFrame;
+    }
+
+    void OnMouseIn()
+    {
+        Debug.Log("Mouse-in");
+    }
+
+    void OnMouseOut()
+    {
+        Debug.Log("Mouse-out");
+    }
+
+    void OnMouseOverlap()
+    {
+        Debug.Log("Mouse-over");
+    }
+
+    void OnMouseClick()
+    {
+        Debug.Log("Mouse-click");
     }
 }
