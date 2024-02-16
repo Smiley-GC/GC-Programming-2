@@ -45,6 +45,18 @@ public class Button : MonoBehaviour
             OnMouseOut();
         }
 
+        // Overlapping if we're currently inside the button, dispatch the mouse-out event!
+        if (collisionThisFrame)
+        {
+            OnMouseOverlap();
+        }
+
+        // If we're currently inside the button and we've left-clicked, dispatch the mouse-click event!
+        if (collisionThisFrame && Input.GetMouseButtonDown(0))
+        {
+            OnMouseClick();
+        }
+
         collision = collisionThisFrame;
     }
 
@@ -60,7 +72,7 @@ public class Button : MonoBehaviour
 
     void OnMouseOverlap()
     {
-        Debug.Log("Mouse-over");
+        //Debug.Log("Mouse-over");
     }
 
     void OnMouseClick()
