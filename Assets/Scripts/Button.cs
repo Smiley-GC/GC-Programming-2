@@ -19,12 +19,24 @@ public class Button : MonoBehaviour
         return true;
     }
 
-    //delegate void MouseHandler();
+    delegate void MouseHandler();
+
+    MouseHandler onMouseIn = null;
+    MouseHandler onMouseOut = null;
+    MouseHandler onMouseOver = null;
+    MouseHandler onMouseClick = null;
+
     bool collision = false;
 
     void Start()
     {
-        
+        onMouseIn = OnMouseIn;
+        onMouseOut = OnMouseOut;
+        onMouseClick = OnMouseClick;
+
+        // Selectively listen to mouse events.
+        // We don't want to listen to mouse-over events cause that spams our console!
+        //onMouseOver = OnMouseOverlap;
     }
 
     void Update()
@@ -34,27 +46,27 @@ public class Button : MonoBehaviour
         GetComponent<SpriteRenderer>().color = collision ? Color.red : Color.green;
 
         // If we were previously outside the button, and now we're inside the button, dispatch the mouse-in event!
-        if (!collision && collisionThisFrame)
+        if (!collision && collisionThisFrame && onMouseIn != null)
         {
-            OnMouseIn();
+            onMouseIn();
         }
 
         // If we were previously inside the button, and we're outside the button, dispatch the mouse-out event!
-        if (collision && !collisionThisFrame)
+        if (collision && !collisionThisFrame && onMouseOut != null)
         {
-            OnMouseOut();
+            onMouseOut();
         }
 
         // Overlapping if we're currently inside the button, dispatch the mouse-out event!
-        if (collisionThisFrame)
+        if (collisionThisFrame && onMouseOver != null)
         {
-            OnMouseOverlap();
+            onMouseOver();
         }
 
         // If we're currently inside the button and we've left-clicked, dispatch the mouse-click event!
-        if (collisionThisFrame && Input.GetMouseButtonDown(0))
+        if (collisionThisFrame && Input.GetMouseButtonDown(0) && onMouseClick != null)
         {
-            OnMouseClick();
+            onMouseClick();
         }
 
         collision = collisionThisFrame;
@@ -72,7 +84,7 @@ public class Button : MonoBehaviour
 
     void OnMouseOverlap()
     {
-        //Debug.Log("Mouse-over");
+        Debug.Log("Mouse-over");
     }
 
     void OnMouseClick()
