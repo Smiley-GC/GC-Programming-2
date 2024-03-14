@@ -75,7 +75,8 @@ public class TileGrid : MonoBehaviour
         //Vector2Int cell = new Vector2Int((int)mouse.x, (int)mouse.y);
         int mouseRow = (int)mouse.y;
         int mouseCol = (int)mouse.x;
-        tiles[mouseRow][mouseCol].GetComponent<SpriteRenderer>().color = Color.magenta;
+        tiles[mouseRow][mouseCol].GetComponent<SpriteRenderer>().color =
+            types[mouseRow, mouseCol] == 1 ? Color.green : Color.red;
 
         // Colour adjacent tiles red if impassible or green if passible.
         // Ensure you don't get any runtime errors (ie index out of range exception)
@@ -84,9 +85,19 @@ public class TileGrid : MonoBehaviour
 
     void Clairvoyance(int row, int col)
     {
-        tiles[row][col - 1].GetComponent<SpriteRenderer>().color = Color.blue;
-        tiles[row][col + 1].GetComponent<SpriteRenderer>().color = Color.blue;
-        tiles[row - 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
-        tiles[row + 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
+        int left = col - 1;
+        int right = col + 1;
+        int up = row - 1;
+        int down = row + 1;
+
+        Color leftColor = types[row, left] == 1 ? Color.green : Color.red;
+        Color rightColor = types[row, right] == 1 ? Color.green : Color.red;
+        Color upColor = types[up, col] == 1 ? Color.green : Color.red;
+        Color downColor = types[down, col] == 1 ? Color.green : Color.red;
+
+        tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
+        tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor;
+        tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
+        tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
     }
 }
