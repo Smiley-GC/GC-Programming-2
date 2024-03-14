@@ -84,6 +84,9 @@ public class TileGrid : MonoBehaviour
 
     void Clairvoyance(int row, int col)
     {
-        
+        tiles[row][col - 1].GetComponent<SpriteRenderer>().color = Color.blue;
+        tiles[row][col + 1].GetComponent<SpriteRenderer>().color = Color.blue;
+        tiles[row - 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
+        tiles[row + 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
     }
 }
