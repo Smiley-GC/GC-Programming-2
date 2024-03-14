@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum WeaponType
 {
@@ -11,10 +12,13 @@ public enum WeaponType
 
 public class Player : MonoBehaviour
 {
+    UnityEvent onShoot = new UnityEvent();
+
     Timer shootTimer = new Timer();
     Timer reloadTimer = new Timer();
     const int clipSize = 30;
     int clip = clipSize;
+    int bulletCounter = 0;
 
     public GameObject projectilePrefab;
     Weapon weapon = null;
@@ -27,6 +31,9 @@ public class Player : MonoBehaviour
         // Shoot our weapon every 0.5 seconds
         shootTimer.total = 0.5f;
         reloadTimer.total = 2.0f;
+
+        // "When we dispatch a shoot event, the ShootHandler() function will be called"
+        onShoot.AddListener(ShootHandler);
     }
 
     void Update()
@@ -78,6 +85,7 @@ public class Player : MonoBehaviour
                 shootTimer.Reset();
                 weapon.Fire(transform.position + transform.right, transform.right);
                 clip--;
+                onShoot.Invoke();
             }
 
             // Ensure we reset our reload timer only once when we run out of amo
@@ -91,9 +99,17 @@ public class Player : MonoBehaviour
         {
             reloadTimer.Tick(dt);
         }
-        Debug.Log(clip);
 
         transform.position += velocity * moveSpeed * dt;
+    }
+
+    void ShootHandler()
+    {
+        bulletCounter++;
+        if (bulletCounter == 10)
+        {
+            Debug.Log("Achievement unlocked: Trigger Happy");
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
