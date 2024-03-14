@@ -1,6 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
+
+public struct Cell
+{
+    public int row;
+    public int col;
+}
 
 public class TileGrid : MonoBehaviour
 {
@@ -68,36 +75,62 @@ public class TileGrid : MonoBehaviour
             }
         }
 
-
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouse = new Vector2(mouse.x, types.GetLength(0) - mouse.y);
-        // Consider using the built-in Vector2Int type when accessing a 2d array
-        //Vector2Int cell = new Vector2Int((int)mouse.x, (int)mouse.y);
-        int mouseRow = (int)mouse.y;
-        int mouseCol = (int)mouse.x;
-        tiles[mouseRow][mouseCol].GetComponent<SpriteRenderer>().color =
-            types[mouseRow, mouseCol] == 1 ? Color.green : Color.red;
-
-        // Colour adjacent tiles red if impassible or green if passible.
-        // Ensure you don't get any runtime errors (ie index out of range exception)
-        Clairvoyance(mouseRow, mouseCol);
+        Cell mouseCell = new Cell { row = (int)mouse.y, col = (int)mouse.x };
+        mouseCell.row = Mathf.Clamp(mouseCell.row, 0, rows - 1);
+        mouseCell.col = Mathf.Clamp(mouseCell.col, 0, cols - 1);
+        Clairvoyance(mouseCell);
     }
 
-    void Clairvoyance(int row, int col)
+    // Colors a tile prefab based on the types array (1:1 map between "types" and "tiles" arrays)
+    void ColorTile(Cell cell)
     {
-        int left = col - 1;
-        int right = col + 1;
-        int up = row - 1;
-        int down = row + 1;
+        tiles[cell.row][cell.col].GetComponent<SpriteRenderer>().color =
+        types[cell.row, cell.col] == 1 ? Color.green : Color.red;
+    }
 
-        Color leftColor = types[row, left] == 1 ? Color.green : Color.red;
-        Color rightColor = types[row, right] == 1 ? Color.green : Color.red;
-        Color upColor = types[up, col] == 1 ? Color.green : Color.red;
-        Color downColor = types[down, col] == 1 ? Color.green : Color.red;
+    void Clairvoyance(Cell current)
+    {
+        // Manual unbounded implementation:
+        //int left = col - 1;
+        //int right = col + 1;
+        //int up = row - 1;
+        //int down = row + 1;
+        //
+        //Color leftColor = types[row, left] == 1 ? Color.green : Color.red;
+        //Color rightColor = types[row, right] == 1 ? Color.green : Color.red;
+        //Color upColor = types[up, col] == 1 ? Color.green : Color.red;
+        //Color downColor = types[down, col] == 1 ? Color.green : Color.red;
+        //
+        //tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
+        //tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor;
+        //tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
+        //tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
 
-        tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
-        tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor;
-        tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
-        tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
+        // Bounded automatic implementation:
+        foreach (Cell neighbour in Neighbours(current))
+            ColorTile(neighbour);
+        ColorTile(current);
+    }
+
+    // Returns grid-coordinates (Cell) of adjacent tiles if they're on the grid 
+    List<Cell> Neighbours(Cell cell)
+    {
+        List<Cell> neighbours = new List<Cell>();
+        int rows = types.GetLength(0);
+        int cols = types.GetLength(1);
+
+        int left = cell.col - 1;
+        int right = cell.col + 1;
+        int up = cell.row - 1;
+        int down = cell.row + 1;
+
+        if (left >= 0) neighbours.Add(new Cell { row = cell.row, col = left });
+        if (right < cols) neighbours.Add(new Cell { row = cell.row, col = right });
+        if (up >= 0) neighbours.Add(new Cell { row = up, col = cell.col });
+        if (down < rows) neighbours.Add(new Cell { row = down, col = cell.col });
+
+        return neighbours;
     }
 }
