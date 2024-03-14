@@ -131,16 +131,6 @@ public class TileGrid : MonoBehaviour
             x = 0.5f;
             y -= 1.0f;
         }
-
-        // TODO -- color using Clairvoyance instead
-        //for (int row = 0; row < rows; row++)
-        //{
-        //    for (int col = 0; col < cols; col++)
-        //    {
-        //        Color color = types[row, col] == 1 ? Color.red : Color.white;
-        //        tiles[row][col].GetComponent<SpriteRenderer>().color = color;
-        //    }
-        //}
     }
 
     void Update()
@@ -148,7 +138,7 @@ public class TileGrid : MonoBehaviour
         int rows = types.GetLength(0);
         int cols = types.GetLength(1);
 
-        // Revert colours to white every frame
+        // Revert tile colours to white every frame
         for (int row = 0; row < rows; row++)
         {
             for (int col = 0; col < cols; col++)
@@ -156,12 +146,6 @@ public class TileGrid : MonoBehaviour
                 tiles[row][col].GetComponent<SpriteRenderer>().color = Color.white;
             }
         }
-
-        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouse = new Vector2(mouse.x, types.GetLength(0) - mouse.y);
-        Cell mouseCell = new Cell { row = (int)mouse.y, col = (int)mouse.x };
-        if (CanMove(mouseCell, rows, cols))
-            ColorTile(mouseCell, Color.magenta);
 
         Command command = null;
         if (Input.GetKeyDown(KeyCode.W))
@@ -181,6 +165,7 @@ public class TileGrid : MonoBehaviour
             command = new RightCommand();
         }
 
+        // Assign data & run command if a key has been pressed (meaning the command will be non-null)
         if (command != null)
         {
             command.cell = player;
@@ -190,62 +175,65 @@ public class TileGrid : MonoBehaviour
             commands.Add(command);
         }
 
+        // If we've pressed the undo button and there's an undo history, perform the undo
         if (Input.GetKeyDown(KeyCode.Z) && commands.Count > 0)
         {
             commands[commands.Count - 1].Undo();
             commands.RemoveAt(commands.Count - 1);
         }
-        
-        //Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
-        //player = CanMove(newPlayer, rows, cols) ? newPlayer : player;
+
         ColorTile(player, Color.red);
 
+        // Uncomment for lab 4 solution:
+        //Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //mouse = new Vector2(mouse.x, types.GetLength(0) - mouse.y);
+        //Cell mouseCell = new Cell { row = (int)mouse.y, col = (int)mouse.x };
         //mouseCell.row = Mathf.Clamp(mouseCell.row, 0, rows - 1);
         //mouseCell.col = Mathf.Clamp(mouseCell.col, 0, cols - 1);
-        //Clairvoyance(mouseCell);
+        //Clairvoyance(mouseCell, rows, cols);
+        //ColorTile(mouseCell, Color.magenta);
     }
 
     // Colors a tile prefab based on the types array (1:1 map between "types" and "tiles" arrays)
     void ColorTile(Cell cell)
     {
-        tiles[cell.row][cell.col].GetComponent<SpriteRenderer>().color =
-        types[cell.row, cell.col] == 1 ? Color.green : Color.red;
+        ColorTile(cell, types[cell.row, cell.col] == 1 ? Color.green : Color.red);
     }
 
+    // Colors a tile prefab the passed in color
     void ColorTile(Cell cell, Color color)
     {
         tiles[cell.row][cell.col].GetComponent<SpriteRenderer>().color = color;
     }
 
-    void Clairvoyance(Cell current)
+    // Colors adjacent tiles green if they're walkable or red if they're unwalkable
+    void Clairvoyance(Cell current, int rows, int cols)
     {
-        // Bounded automatic implementation:
-        foreach (Cell neighbour in Neighbours(current))
+        foreach (Cell neighbour in Neighbours(current, rows, cols))
             ColorTile(neighbour);
         ColorTile(current);
     }
 
+    // Returns whether the cell is within the bounds of the grid
     public static bool CanMove(Cell cell, int rows, int cols)
     {
         return cell.row >= 0 && cell.col >= 0 && cell.row < rows && cell.col < cols;
     }
 
-    // Returns grid-coordinates (Cell) of adjacent tiles if they're on the grid 
-    List<Cell> Neighbours(Cell cell)
+    // Returns grid-coordinates (Cell) of adjacent tiles if they're within the grid's bounds
+    public static List<Cell> Neighbours(Cell cell, int rows, int cols)
     {
         List<Cell> neighbours = new List<Cell>();
-        int rows = types.GetLength(0);
-        int cols = types.GetLength(1);
 
-        int left = cell.col - 1;
-        int right = cell.col + 1;
-        int up = cell.row - 1;
-        int down = cell.row + 1;
+        Cell left = new Cell { row = cell.row, col = cell.col - 1 };
+        Cell right = new Cell { row = cell.row, col = cell.col + 1 };
+        Cell up = new Cell { row = cell.row - 1, col = cell.col };
+        Cell down = new Cell { row = cell.row + 1, col = cell.col };
 
-        if (left >= 0) neighbours.Add(new Cell { row = cell.row, col = left });
-        if (right < cols) neighbours.Add(new Cell { row = cell.row, col = right });
-        if (up >= 0) neighbours.Add(new Cell { row = up, col = cell.col });
-        if (down < rows) neighbours.Add(new Cell { row = down, col = cell.col });
+        if (CanMove(cell, rows, cols)) neighbours.Add(left);
+        if (CanMove(right, rows, cols)) neighbours.Add(right);
+        if (CanMove(up, rows, cols)) neighbours.Add(up);
+        if (CanMove(down, rows, cols)) neighbours.Add(down);
 
         return neighbours;
     }
