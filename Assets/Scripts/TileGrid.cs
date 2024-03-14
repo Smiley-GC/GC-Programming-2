@@ -78,9 +78,14 @@ public class TileGrid : MonoBehaviour
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouse = new Vector2(mouse.x, types.GetLength(0) - mouse.y);
         Cell mouseCell = new Cell { row = (int)mouse.y, col = (int)mouse.x };
-        mouseCell.row = Mathf.Clamp(mouseCell.row, 0, rows - 1);
-        mouseCell.col = Mathf.Clamp(mouseCell.col, 0, cols - 1);
-        Clairvoyance(mouseCell);
+        if (CanMove(mouseCell))
+        {
+            tiles[mouseCell.row][mouseCell.col].GetComponent<SpriteRenderer>().color = Color.magenta;
+        }
+
+        //mouseCell.row = Mathf.Clamp(mouseCell.row, 0, rows - 1);
+        //mouseCell.col = Mathf.Clamp(mouseCell.col, 0, cols - 1);
+        //Clairvoyance(mouseCell);
     }
 
     // Colors a tile prefab based on the types array (1:1 map between "types" and "tiles" arrays)
@@ -112,6 +117,13 @@ public class TileGrid : MonoBehaviour
         foreach (Cell neighbour in Neighbours(current))
             ColorTile(neighbour);
         ColorTile(current);
+    }
+
+    bool CanMove(Cell cell)
+    {
+        int rows = types.GetLength(0);
+        int cols = types.GetLength(1);
+        return cell.row >= 0 && cell.col >= 0 && cell.row < rows && cell.col < cols;
     }
 
     // Returns grid-coordinates (Cell) of adjacent tiles if they're on the grid 
