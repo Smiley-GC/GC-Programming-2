@@ -20,6 +20,12 @@ public class Player : MonoBehaviour
     int clip = clipSize;
     int bulletCounter = 0;
 
+    // "Any function that returns void and takes a string as an argument is considered WeaponSwitch"
+    delegate void WeaponSwitch(string weappys);
+
+    WeaponSwitch onWeaponSwitch;
+    int switchCounter = 0;
+
     public GameObject projectilePrefab;
     Weapon weapon = null;
 
@@ -34,6 +40,9 @@ public class Player : MonoBehaviour
 
         // "When we dispatch a shoot event, the ShootHandler() function will be called"
         onShoot.AddListener(ShootHandler);
+
+        // TODO -- make a loadout switching system instead of switching individual weapons as that's a much more realistic use of delegates
+        onWeaponSwitch = SwitchWeapon;
     }
 
     void Update()
@@ -73,9 +82,6 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
-        // Old approach where we spammed space to fire our weapon
-        //if (Input.GetKeyDown(KeyCode.Space) && weapon != null)
-
         // Shoot if we have amo and have finished reloading, otherwise reload
         if (clip > 0 && reloadTimer.Expired())
         {
@@ -112,21 +118,33 @@ public class Player : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    void SwitchWeapon(string weaponTag)
     {
-        Debug.Log(collision.name);
-        if (collision.CompareTag("Rifle"))
+        switch (weaponTag)
         {
-            weapon = new Rifle();
-        }
-        else if (collision.CompareTag("Shotgun"))
-        {
-            weapon = new Shotgun();
-        }
-        else if (collision.CompareTag("Grenade"))
-        {
-            weapon = new Grenade();
+            case "Rifle":
+                weapon = new Rifle();
+                break;
+
+            case "Shotgun":
+                weapon = new Shotgun();
+                break;
+
+            case "Grenade":
+                weapon = new Grenade();
+                break;
         }
         weapon.prefab = projectilePrefab;
+        switchCounter++;
+        
+        if (switchCounter == 5)
+        {
+            Debug.Log("Achievement unlocked: Switcherooooo");
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        onWeaponSwitch(collision.tag);
     }
 }
