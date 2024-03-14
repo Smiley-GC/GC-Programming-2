@@ -12,6 +12,9 @@ public enum WeaponType
 public class Player : MonoBehaviour
 {
     Timer shootTimer = new Timer();
+    Timer reloadTimer = new Timer();
+    const int clipSize = 30;
+    int clip = clipSize;
 
     public GameObject projectilePrefab;
     Weapon weapon = null;
@@ -23,6 +26,7 @@ public class Player : MonoBehaviour
     {
         // Shoot our weapon every 0.5 seconds
         shootTimer.total = 0.5f;
+        reloadTimer.total = 2.0f;
     }
 
     void Update()
@@ -65,13 +69,29 @@ public class Player : MonoBehaviour
         // Old approach where we spammed space to fire our weapon
         //if (Input.GetKeyDown(KeyCode.Space) && weapon != null)
 
-        // New approach where we fire our weapon based on a timer
-        shootTimer.Tick(dt);
-        if (Input.GetKey(KeyCode.Space) && weapon != null && shootTimer.Expired())
+        // Shoot if we have amo and have finished reloading, otherwise reload
+        if (clip > 0 && reloadTimer.Expired())
         {
-            shootTimer.Reset();
-            weapon.Fire(transform.position + transform.right, transform.right);
+            shootTimer.Tick(dt);
+            if (Input.GetKey(KeyCode.Space) && weapon != null && shootTimer.Expired())
+            {
+                shootTimer.Reset();
+                weapon.Fire(transform.position + transform.right, transform.right);
+                clip--;
+            }
+
+            // Ensure we reset our reload timer only once when we run out of amo
+            if (clip <= 0)
+            {
+                clip = clipSize;
+                reloadTimer.Reset();
+            }
         }
+        else
+        {
+            reloadTimer.Tick(dt);
+        }
+        Debug.Log(clip);
 
         transform.position += velocity * moveSpeed * dt;
     }
