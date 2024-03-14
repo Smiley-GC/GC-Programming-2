@@ -28,6 +28,8 @@ public class TileGrid : MonoBehaviour
         { 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
+    Cell player = new Cell { row = 4, col = 9 };
+
     void Start()
     {
         int rows = types.GetLength(0);
@@ -79,9 +81,29 @@ public class TileGrid : MonoBehaviour
         mouse = new Vector2(mouse.x, types.GetLength(0) - mouse.y);
         Cell mouseCell = new Cell { row = (int)mouse.y, col = (int)mouse.x };
         if (CanMove(mouseCell))
+            ColorTile(mouseCell, Color.magenta);
+
+        int dy = 0, dx = 0;
+        if (Input.GetKeyDown(KeyCode.W))
         {
-            tiles[mouseCell.row][mouseCell.col].GetComponent<SpriteRenderer>().color = Color.magenta;
+            dy = -1;
         }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            dy = 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            dx = -1;
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            dx = 1;
+        }
+         
+        Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
+        player = CanMove(newPlayer) ? newPlayer : player;
+        ColorTile(player, Color.red);
 
         //mouseCell.row = Mathf.Clamp(mouseCell.row, 0, rows - 1);
         //mouseCell.col = Mathf.Clamp(mouseCell.col, 0, cols - 1);
@@ -95,24 +117,13 @@ public class TileGrid : MonoBehaviour
         types[cell.row, cell.col] == 1 ? Color.green : Color.red;
     }
 
+    void ColorTile(Cell cell, Color color)
+    {
+        tiles[cell.row][cell.col].GetComponent<SpriteRenderer>().color = color;
+    }
+
     void Clairvoyance(Cell current)
     {
-        // Manual unbounded implementation:
-        //int left = col - 1;
-        //int right = col + 1;
-        //int up = row - 1;
-        //int down = row + 1;
-        //
-        //Color leftColor = types[row, left] == 1 ? Color.green : Color.red;
-        //Color rightColor = types[row, right] == 1 ? Color.green : Color.red;
-        //Color upColor = types[up, col] == 1 ? Color.green : Color.red;
-        //Color downColor = types[down, col] == 1 ? Color.green : Color.red;
-        //
-        //tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
-        //tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor;
-        //tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
-        //tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
-
         // Bounded automatic implementation:
         foreach (Cell neighbour in Neighbours(current))
             ColorTile(neighbour);
