@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
-public struct Cell
+public class Cell
 {
     public int row;
     public int col;
@@ -11,6 +10,86 @@ public struct Cell
 
 public class TileGrid : MonoBehaviour
 {
+    public abstract class Command
+    {
+        public abstract void Run();
+        public abstract void Undo();
+
+        // *Can change row & col, but CANNOT change address (aka cannot assign to new Cell)*
+        public Cell cell;
+        public int rows;
+        public int cols;
+
+        protected void Move(Cell dst)
+        {
+            if (CanMove(dst, rows, cols))
+            {
+                cell.row = dst.row;
+                cell.col = dst.col;
+            }
+        }
+    }
+
+    public class LeftCommand : Command
+    {
+        public override void Run()
+        {
+            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
+            Move(newCell);
+        }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
+            Move(newCell);
+        }
+    }
+
+    public class RightCommand : Command
+    {
+        public override void Run()
+        {
+            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
+            Move(newCell);
+        }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
+            Move(newCell);
+        }
+    }
+
+    public class UpCommand : Command
+    {
+        public override void Run()
+        {
+            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
+            Move(newCell);
+        }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
+            Move(newCell);
+        }
+    }
+
+    public class DownCommand : Command
+    {
+        public override void Run()
+        {
+            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
+            Move(newCell);
+        }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
+            Move(newCell);
+        }
+    }
+
     public GameObject tilePrefab;
     List<List<GameObject>> tiles = new List<List<GameObject>>();
 
@@ -29,6 +108,7 @@ public class TileGrid : MonoBehaviour
     };
 
     Cell player = new Cell { row = 4, col = 9 };
+    List<Command> commands = new List<Command>();
 
     void Start()
     {
@@ -80,29 +160,44 @@ public class TileGrid : MonoBehaviour
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouse = new Vector2(mouse.x, types.GetLength(0) - mouse.y);
         Cell mouseCell = new Cell { row = (int)mouse.y, col = (int)mouse.x };
-        if (CanMove(mouseCell))
+        if (CanMove(mouseCell, rows, cols))
             ColorTile(mouseCell, Color.magenta);
 
-        int dy = 0, dx = 0;
+        Command command = null;
         if (Input.GetKeyDown(KeyCode.W))
         {
-            dy = -1;
+            command = new UpCommand();
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            dy = 1;
+            command = new DownCommand();
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            dx = -1;
+            command = new LeftCommand();
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            dx = 1;
+            command = new RightCommand();
         }
-         
-        Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
-        player = CanMove(newPlayer) ? newPlayer : player;
+
+        if (command != null)
+        {
+            command.cell = player;
+            command.rows = rows;
+            command.cols = cols;
+            command.Run();
+            commands.Add(command);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Z) && commands.Count > 0)
+        {
+            commands[commands.Count - 1].Undo();
+            commands.RemoveAt(commands.Count - 1);
+        }
+        
+        //Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
+        //player = CanMove(newPlayer, rows, cols) ? newPlayer : player;
         ColorTile(player, Color.red);
 
         //mouseCell.row = Mathf.Clamp(mouseCell.row, 0, rows - 1);
@@ -130,10 +225,8 @@ public class TileGrid : MonoBehaviour
         ColorTile(current);
     }
 
-    bool CanMove(Cell cell)
+    public static bool CanMove(Cell cell, int rows, int cols)
     {
-        int rows = types.GetLength(0);
-        int cols = types.GetLength(1);
         return cell.row >= 0 && cell.col >= 0 && cell.row < rows && cell.col < cols;
     }
 
