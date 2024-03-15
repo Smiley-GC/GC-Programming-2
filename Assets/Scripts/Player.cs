@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum WeaponType
 {
@@ -13,11 +14,18 @@ public class Player : MonoBehaviour
 {
     public GameObject projectilePrefab;
     Weapon weapon = null;
+
     const int clipSize = 10;
     int clip = clipSize;
 
+    int shotCounter = 0;
+
     Timer shootCooldown = new Timer();
     Timer reloadCooldown = new Timer();
+
+    UnityEvent onShoot = new UnityEvent();
+    delegate void WeaponSwitch();
+    WeaponSwitch onWeaponSwitch;
 
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
@@ -27,6 +35,9 @@ public class Player : MonoBehaviour
         // Shoot every half-second
         shootCooldown.total = 0.5f;
         reloadCooldown.total = 2.0f;
+
+        // Add our shoot event handler (runs when we dispatch a Shoot event)
+        onShoot.AddListener(ShootHandler);
     }
 
     void Update()
@@ -72,6 +83,7 @@ public class Player : MonoBehaviour
         {
             shootCooldown.Reset();
             weapon.Fire(transform.position, transform.right);
+            onShoot.Invoke();
             clip--;
             Debug.Log(clip);
 
@@ -91,23 +103,50 @@ public class Player : MonoBehaviour
         transform.position += velocity * moveSpeed * dt;
     }
 
+    void ShootHandler()
+    {
+        shotCounter++;
+        if (shotCounter == 5)
+        {
+            Debug.Log("Acheivement Unlocked: Trigger Happy");
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log(collision.name);
-        if (collision.CompareTag("Rifle"))
+        switch (collision.tag)
         {
-            weapon = new Rifle();
-        }
-        else if (collision.CompareTag("Shotgun"))
-        {
-            weapon = new Shotgun();
-        }
-        else if (collision.CompareTag("Grenade"))
-        {
-            weapon = new Grenade();
+            case "Rifle":
+                onWeaponSwitch = EquipRifle;
+                break;
+
+            case "Shotgun":
+                onWeaponSwitch = EquipShotgun;
+                break;
+
+            case "Grenade":
+                onWeaponSwitch = EquipGrenade;
+                break;
         }
 
         // Whenever we overwrite our weapon we have to assign it a prefab
+        onWeaponSwitch();
         weapon.prefab = projectilePrefab;
+    }
+
+    void EquipRifle()
+    {
+        weapon = new Rifle();
+    }
+
+    void EquipShotgun()
+    {
+        weapon = new Shotgun();
+    }
+
+    void EquipGrenade()
+    {
+        weapon = new Grenade();
     }
 }
