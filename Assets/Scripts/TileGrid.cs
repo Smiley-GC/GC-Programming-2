@@ -63,6 +63,8 @@ public class TileGrid : MonoBehaviour
         Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         int mouseRow = (tileTypes.GetLength(0) - 1) - (int)mouse.y;
         int mouseCol = (int)mouse.x;
+        mouseRow = Mathf.Clamp(mouseRow, 0, rows - 1);
+        mouseCol = Mathf.Clamp(mouseCol, 0, cols - 1);
         //Debug.Log(mouse);
 
         // Render adjacent tiles red if lava, green if stone
@@ -77,19 +79,37 @@ public class TileGrid : MonoBehaviour
         tiles[row][col].GetComponent<SpriteRenderer>().color =
             tileTypes[row, col] == 1 ? Color.green : Color.red;
 
+        int rows = tileTypes.GetLength(0);
+        int cols = tileTypes.GetLength(1);
+
         int left = col - 1;
         int right = col + 1;
         int up = row - 1;
         int down = row + 1;
 
-        Color leftColor = tileTypes[row, left] == 1 ? Color.green : Color.red;
-        Color rightColor = tileTypes[row, right] == 1 ? Color.green : Color.red;
-        Color upColor = tileTypes[up, col] == 1 ? Color.green : Color.red;
-        Color downColor = tileTypes[down, col] == 1 ? Color.green : Color.red;
+        if (left >= 0)
+        {
+            Color leftColor = tileTypes[row, left] == 1 ? Color.green : Color.red;
+            tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
+        }
 
-        tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
-        tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor;
-        tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
-        tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
+        if (right < cols)
+        {
+            Color rightColor = tileTypes[row, right] == 1 ? Color.green : Color.red;
+            tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor; 
+        }
+
+        if (up >= 0)
+        {
+            Color upColor = tileTypes[up, col] == 1 ? Color.green : Color.red;
+            tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
+
+        }
+
+        if (down < rows)
+        {
+            Color downColor = tileTypes[down, col] == 1 ? Color.green : Color.red;
+            tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
+        }
     }
 }
