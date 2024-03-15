@@ -39,10 +39,6 @@ public class TileGrid : MonoBehaviour
                 tile.transform.position = new Vector3(x, y, 0.0f);
                 columns.Add(tile);
                 x += 1.0f;
-
-                // Color based on tile type!
-                Color color = tileTypes[row, col] == 1 ? Color.red : Color.white;
-                tile.GetComponent<SpriteRenderer>().color = color;
             }
             tiles.Add(columns);
             x = xStart;
@@ -77,11 +73,23 @@ public class TileGrid : MonoBehaviour
     void Clairvoyance(int row, int col)
     {
         // Cursor column (don't change this)
-        tiles[row][col].GetComponent<SpriteRenderer>().color = Color.magenta;
+        //tiles[row][col].GetComponent<SpriteRenderer>().color = Color.magenta;
+        tiles[row][col].GetComponent<SpriteRenderer>().color =
+            tileTypes[row, col] == 1 ? Color.green : Color.red;
 
-        tiles[row][col - 1].GetComponent<SpriteRenderer>().color = Color.blue;
-        tiles[row][col + 1].GetComponent<SpriteRenderer>().color = Color.blue;
-        tiles[row - 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
-        tiles[row + 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
+        int left = col - 1;
+        int right = col + 1;
+        int up = row - 1;
+        int down = row + 1;
+
+        Color leftColor = tileTypes[row, left] == 1 ? Color.green : Color.red;
+        Color rightColor = tileTypes[row, right] == 1 ? Color.green : Color.red;
+        Color upColor = tileTypes[up, col] == 1 ? Color.green : Color.red;
+        Color downColor = tileTypes[down, col] == 1 ? Color.green : Color.red;
+
+        tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
+        tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor;
+        tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
+        tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
     }
 }
