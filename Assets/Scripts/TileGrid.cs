@@ -71,13 +71,22 @@ public class TileGrid : MonoBehaviour
         Clairvoyance(mouseRow, mouseCol);
     }
 
+    void ColorTile(int row, int col, Color color)
+    {
+        tiles[row][col].GetComponent<SpriteRenderer>().color = color;
+    }
+
+    void ColorTile(int row, int col)
+    {
+        Color color = tileTypes[row, col] == 1 ? Color.green : Color.red;
+        ColorTile(row, col, color);
+    }
+
     // Tip: start by making a blue +, then colour tiles red/green based on condition, finally fix index errors
     void Clairvoyance(int row, int col)
     {
         // Cursor column (don't change this)
-        //tiles[row][col].GetComponent<SpriteRenderer>().color = Color.magenta;
-        tiles[row][col].GetComponent<SpriteRenderer>().color =
-            tileTypes[row, col] == 1 ? Color.green : Color.red;
+        ColorTile(row, col, Color.magenta);
 
         int rows = tileTypes.GetLength(0);
         int cols = tileTypes.GetLength(1);
@@ -88,28 +97,15 @@ public class TileGrid : MonoBehaviour
         int down = row + 1;
 
         if (left >= 0)
-        {
-            Color leftColor = tileTypes[row, left] == 1 ? Color.green : Color.red;
-            tiles[row][left].GetComponent<SpriteRenderer>().color = leftColor;
-        }
+            ColorTile(row, left);
 
         if (right < cols)
-        {
-            Color rightColor = tileTypes[row, right] == 1 ? Color.green : Color.red;
-            tiles[row][right].GetComponent<SpriteRenderer>().color = rightColor; 
-        }
+            ColorTile(row, right);
 
         if (up >= 0)
-        {
-            Color upColor = tileTypes[up, col] == 1 ? Color.green : Color.red;
-            tiles[up][col].GetComponent<SpriteRenderer>().color = upColor;
-
-        }
+            ColorTile(up, col);
 
         if (down < rows)
-        {
-            Color downColor = tileTypes[down, col] == 1 ? Color.green : Color.red;
-            tiles[down][col].GetComponent<SpriteRenderer>().color = downColor;
-        }
+            ColorTile(down, col);
     }
 }
