@@ -12,11 +12,26 @@ public class TileGrid : MonoBehaviour
 {
     abstract class Command
     {
+        // Run is called externally so its public
         public abstract void Run();
 
-        protected bool CanMove(Cell cell)
+        // Nothing but Move uses CanMove, so CanMove should be private
+        private bool CanMove(Cell cell)
         {
             return cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows;
+        }
+        
+        // Move is used by derived classes so its protected
+        protected void Move(Cell newCell)
+        {
+            // C# object addresses are passed by value, meaning we cannot reassign them in functions
+            //cell = CanMove(newCell) ? newCell : cell;
+            // Hence, we must manually change the row & col of our cell!
+            if (CanMove(newCell))
+            {
+                cell.row = newCell.row;
+                cell.col = newCell.col;
+            }
         }
 
         public int rows;
@@ -29,7 +44,7 @@ public class TileGrid : MonoBehaviour
         public override void Run()
         {
             Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
-            cell = CanMove(newCell) ? newCell : cell;
+            Move(newCell);
         }
     }
 
@@ -37,7 +52,8 @@ public class TileGrid : MonoBehaviour
     {
         public override void Run()
         {
-
+            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
+            Move(newCell);
         }
     }
 
@@ -45,7 +61,8 @@ public class TileGrid : MonoBehaviour
     {
         public override void Run()
         {
-
+            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
+            Move(newCell);
         }
     }
 
@@ -53,7 +70,8 @@ public class TileGrid : MonoBehaviour
     {
         public override void Run()
         {
-
+            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
+            Move(newCell);
         }
     }
 
@@ -138,9 +156,11 @@ public class TileGrid : MonoBehaviour
         Command command = null;
         if (Input.GetKeyDown(KeyCode.W))
         {
+            command = new UpCommand();
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
+            command = new DownCommand();
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
@@ -148,7 +168,7 @@ public class TileGrid : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-
+            command = new RightCommand();
         }
 
         if (command != null)
