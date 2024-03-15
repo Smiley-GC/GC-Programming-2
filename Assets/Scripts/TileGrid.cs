@@ -27,6 +27,8 @@ public class TileGrid : MonoBehaviour
         { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
+    Cell player = new Cell { row = 4, col = 9 };
+
     void Start()
     {
         int rows = tileTypes.GetLength(0);
@@ -65,13 +67,43 @@ public class TileGrid : MonoBehaviour
             }
         }
 
+        int dx = 0;
+        int dy = 0;
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            dy = -1;
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            dy = 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            dx = -1;
+        }
+        else if (Input.GetKeyDown(KeyCode.D))
+        {
+            dx = 1;
+        }
+        Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
+        player = CanMove(newPlayer) ? newPlayer : player;
+        ColorTile(player, Color.magenta);
+
+        // Uncomment for lab 4 solution
         // Mouse --> screen space --> world space --> grid space
-        Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        int mouseRow = (tileTypes.GetLength(0) - 1) - (int)mouse.y;
-        int mouseCol = (int)mouse.x;
-        mouseRow = Mathf.Clamp(mouseRow, 0, rows - 1);
-        mouseCol = Mathf.Clamp(mouseCol, 0, cols - 1);
-        Clairvoyance(new Cell { row = mouseRow, col = mouseCol });
+        //Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //int mouseRow = (tileTypes.GetLength(0) - 1) - (int)mouse.y;
+        //int mouseCol = (int)mouse.x;
+        //mouseRow = Mathf.Clamp(mouseRow, 0, rows - 1);
+        //mouseCol = Mathf.Clamp(mouseCol, 0, cols - 1);
+        //Clairvoyance(new Cell { row = mouseRow, col = mouseCol });
+    }
+
+    bool CanMove(Cell cell)
+    {
+        int rows = tileTypes.GetLength(0);
+        int cols = tileTypes.GetLength(1);
+        return cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows;
     }
 
     void ColorTile(Cell cell, Color color)
