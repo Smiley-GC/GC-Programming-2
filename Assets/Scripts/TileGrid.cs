@@ -10,6 +10,53 @@ public class Cell
 
 public class TileGrid : MonoBehaviour
 {
+    abstract class Command
+    {
+        public abstract void Run();
+
+        protected bool CanMove(Cell cell)
+        {
+            return cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows;
+        }
+
+        public int rows;
+        public int cols;
+        public Cell cell;
+    }
+
+    class LeftCommand : Command
+    {
+        public override void Run()
+        {
+            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
+            cell = CanMove(newCell) ? newCell : cell;
+        }
+    }
+
+    class RightCommand : Command
+    {
+        public override void Run()
+        {
+
+        }
+    }
+
+    class UpCommand : Command
+    {
+        public override void Run()
+        {
+
+        }
+    }
+
+    class DownCommand : Command
+    {
+        public override void Run()
+        {
+
+        }
+    }
+
     public GameObject tilePrefab;
     List<List<GameObject>> tiles = new List<List<GameObject>>();
 
@@ -67,26 +114,51 @@ public class TileGrid : MonoBehaviour
             }
         }
 
-        int dx = 0;
-        int dy = 0;
+        //int dx = 0;
+        //int dy = 0;
+        //if (Input.GetKeyDown(KeyCode.W))
+        //{
+        //    dy = -1;
+        //}
+        //else if (Input.GetKeyDown(KeyCode.S))
+        //{
+        //    dy = 1;
+        //}
+        //else if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    dx = -1;
+        //}
+        //else if (Input.GetKeyDown(KeyCode.D))
+        //{
+        //    dx = 1;
+        //}
+        //Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
+        //player = CanMove(newPlayer) ? newPlayer : player;
+
+        Command command = null;
         if (Input.GetKeyDown(KeyCode.W))
         {
-            dy = -1;
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            dy = 1;
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            dx = -1;
+            command = new LeftCommand();
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            dx = 1;
+
         }
-        Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
-        player = CanMove(newPlayer) ? newPlayer : player;
+
+        if (command != null)
+        {
+            command.rows = rows;
+            command.cols = cols;
+            command.cell = player;
+            command.Run();
+        }
+
         ColorTile(player, Color.magenta);
 
         // Uncomment for lab 4 solution
