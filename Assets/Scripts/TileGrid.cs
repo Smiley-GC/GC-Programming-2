@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class Cell
+{
+    public int row;
+    public int col;
+}
+
 public class TileGrid : MonoBehaviour
 {
     public GameObject tilePrefab;
@@ -65,47 +71,51 @@ public class TileGrid : MonoBehaviour
         int mouseCol = (int)mouse.x;
         mouseRow = Mathf.Clamp(mouseRow, 0, rows - 1);
         mouseCol = Mathf.Clamp(mouseCol, 0, cols - 1);
-        //Debug.Log(mouse);
-
-        // Render adjacent tiles red if lava, green if stone
-        Clairvoyance(mouseRow, mouseCol);
+        Clairvoyance(new Cell { row = mouseRow, col = mouseCol });
     }
 
-    void ColorTile(int row, int col, Color color)
+    void ColorTile(Cell cell, Color color)
     {
-        tiles[row][col].GetComponent<SpriteRenderer>().color = color;
+        tiles[cell.row][cell.col].GetComponent<SpriteRenderer>().color = color;
     }
 
-    void ColorTile(int row, int col)
+    void ColorTile(Cell cell)
     {
-        Color color = tileTypes[row, col] == 1 ? Color.green : Color.red;
-        ColorTile(row, col, color);
+        Color color = tileTypes[cell.row, cell.col] == 1 ? Color.green : Color.red;
+        ColorTile(cell, color);
     }
 
-    // Tip: start by making a blue +, then colour tiles red/green based on condition, finally fix index errors
-    void Clairvoyance(int row, int col)
+    void Clairvoyance(Cell cell)
     {
-        // Cursor column (don't change this)
-        ColorTile(row, col, Color.magenta);
+        foreach (Cell neighbour in Neighbours(cell))
+            ColorTile(neighbour);
+        ColorTile(cell, Color.magenta);
+    }
 
+    // Returns left-right-up-down cell of the passed in cell
+    List<Cell> Neighbours(Cell cell)
+    {
         int rows = tileTypes.GetLength(0);
         int cols = tileTypes.GetLength(1);
+        int left = cell.col - 1;
+        int right = cell.col + 1;
+        int up = cell.row - 1;
+        int down = cell.row + 1;
 
-        int left = col - 1;
-        int right = col + 1;
-        int up = row - 1;
-        int down = row + 1;
+        List<Cell> neighbours = new List<Cell>();
 
         if (left >= 0)
-            ColorTile(row, left);
+            neighbours.Add(new Cell { row = cell.row, col = left });
 
         if (right < cols)
-            ColorTile(row, right);
+            neighbours.Add(new Cell { row = cell.row, col = right });
 
         if (up >= 0)
-            ColorTile(up, col);
+            neighbours.Add(new Cell { row = up, col = cell.col });
 
         if (down < rows)
-            ColorTile(down, col);
+            neighbours.Add(new Cell { row = down, col = cell.col });
+
+        return neighbours;
     }
 }
