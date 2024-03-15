@@ -117,6 +117,7 @@ public class TileGrid : MonoBehaviour
         { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
+    List<Command> commands = new List<Command>();
     Cell player = new Cell { row = 4, col = 9 };
 
     void Start()
@@ -201,7 +202,14 @@ public class TileGrid : MonoBehaviour
             command.rows = rows;
             command.cols = cols;
             command.cell = player;
-            command.Undo();
+            command.Run();
+            commands.Add(command);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Z) && commands.Count > 0)
+        {
+            commands[commands.Count - 1].Undo();
+            commands.RemoveAt(commands.Count - 1);
         }
 
         ColorTile(player, Color.magenta);
