@@ -14,6 +14,7 @@ public class TileGrid : MonoBehaviour
     {
         // Run is called externally so its public
         public abstract void Run();
+        public abstract void Undo();
 
         // Nothing but Move uses CanMove, so CanMove should be private
         private bool CanMove(Cell cell)
@@ -46,6 +47,12 @@ public class TileGrid : MonoBehaviour
             Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
             Move(newCell);
         }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
+            Move(newCell);
+        }
     }
 
     class RightCommand : Command
@@ -53,6 +60,12 @@ public class TileGrid : MonoBehaviour
         public override void Run()
         {
             Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
+            Move(newCell);
+        }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
             Move(newCell);
         }
     }
@@ -64,6 +77,12 @@ public class TileGrid : MonoBehaviour
             Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
             Move(newCell);
         }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
+            Move(newCell);
+        }
     }
 
     class DownCommand : Command
@@ -71,6 +90,12 @@ public class TileGrid : MonoBehaviour
         public override void Run()
         {
             Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
+            Move(newCell);
+        }
+
+        public override void Undo()
+        {
+            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
             Move(newCell);
         }
     }
@@ -176,7 +201,7 @@ public class TileGrid : MonoBehaviour
             command.rows = rows;
             command.cols = cols;
             command.cell = player;
-            command.Run();
+            command.Undo();
         }
 
         ColorTile(player, Color.magenta);
