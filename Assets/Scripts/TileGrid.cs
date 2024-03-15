@@ -79,7 +79,9 @@ public class TileGrid : MonoBehaviour
         // Cursor column (don't change this)
         tiles[row][col].GetComponent<SpriteRenderer>().color = Color.magenta;
 
-        // Left column
         tiles[row][col - 1].GetComponent<SpriteRenderer>().color = Color.blue;
+        tiles[row][col + 1].GetComponent<SpriteRenderer>().color = Color.blue;
+        tiles[row - 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
+        tiles[row + 1][col].GetComponent<SpriteRenderer>().color = Color.blue;
     }
 }
