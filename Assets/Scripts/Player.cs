@@ -13,8 +13,11 @@ public class Player : MonoBehaviour
 {
     public GameObject projectilePrefab;
     Weapon weapon = null;
+    const int clipSize = 10;
+    int clip = clipSize;
 
-    Timer weaponCooldown = new Timer();
+    Timer shootCooldown = new Timer();
+    Timer reloadCooldown = new Timer();
 
     float moveSpeed = 10.0f;    // Move at 10 units per second
     float turnSpeed = 360.0f;   // Turn at 360 degrees per seconds
@@ -22,7 +25,8 @@ public class Player : MonoBehaviour
     void Start()
     {
         // Shoot every half-second
-        weaponCooldown.total = 0.5f;
+        shootCooldown.total = 0.5f;
+        reloadCooldown.total = 2.0f;
     }
 
     void Update()
@@ -62,11 +66,26 @@ public class Player : MonoBehaviour
             velocity -= transform.up;
         }
 
-        weaponCooldown.Tick(dt);
-        if (Input.GetKey(KeyCode.Space) && weapon != null && weaponCooldown.Expired())
+        shootCooldown.Tick(dt);
+        // Shoot if space is pressed, we have a weapon, we're off cooldown, and we have amo!
+        if (Input.GetKey(KeyCode.Space) && weapon != null && shootCooldown.Expired() && reloadCooldown.Expired())
         {
-            weaponCooldown.Reset();
+            shootCooldown.Reset();
             weapon.Fire(transform.position, transform.right);
+            clip--;
+            Debug.Log(clip);
+
+            // Check if we've shot our last bullet, begin reloading if so!
+            if (clip <= 0)
+            {
+                reloadCooldown.Reset();
+                clip = clipSize;
+                Debug.Log("Reloading...");
+            }
+        }
+        else
+        {
+            reloadCooldown.Tick(dt);
         }
 
         transform.position += velocity * moveSpeed * dt;
