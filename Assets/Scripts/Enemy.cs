@@ -7,6 +7,7 @@ using UnityEngine;
 // Conditions --> timeout
 public class Enemy : MonoBehaviour
 {
+    public GameObject weaponPrefab;
     public GameObject player;
 
     public Transform[] waypoints;
@@ -22,7 +23,9 @@ public class Enemy : MonoBehaviour
 
     public State state = State.NEUTRAL;
     SpriteRenderer renderer;
-    Timer timer = new Timer();
+    //Timer timer = new Timer();
+    Timer shootCooldown = new Timer();
+    Weapon weapon = new Grenade();
 
     void Transition(State newState)
     {
@@ -86,6 +89,13 @@ public class Enemy : MonoBehaviour
                 break;
 
             case State.OFFENSIVE:
+                shootCooldown.Tick(Time.deltaTime);
+                if (shootCooldown.Expired())
+                {
+                    shootCooldown.Reset();
+                    weapon.Fire(transform.position + transform.right,
+                        (player.transform.position - transform.position).normalized);
+                }
                 break;
 
             case State.DEFENSIVE:
@@ -96,13 +106,17 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         renderer = GetComponent<SpriteRenderer>();
-        timer.total = 5.0f;
+        
+        //timer.total = 5.0f;
+        shootCooldown.total = 0.1f;
+        weapon.prefab = weaponPrefab;
+
         OnEnter(state);
     }
 
     void Update()
     {
-        timer.Tick(Time.deltaTime);
+        //timer.Tick(Time.deltaTime);
         OnUpdate();
     }
 
