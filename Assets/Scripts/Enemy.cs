@@ -7,6 +7,10 @@ using UnityEngine;
 // Conditions --> timeout
 public class Enemy : MonoBehaviour
 {
+    public Transform[] waypoints;
+    int waypointIndex = 0;
+    float speed = 10.0f;
+
     public enum State
     {
         NEUTRAL,
@@ -50,37 +54,59 @@ public class Enemy : MonoBehaviour
     void OnUpdate()
     {
         // *Condition* to transition state
-        if (timer.Expired())
-        {
-            timer.Reset();
-            switch (state)
-            {
-                // Neutral can transition between offensive and defensive
-                case State.NEUTRAL:
-                    // Toss a coin to determine offensive vs defensive
-                    bool offensive = Random.Range(0, 2) == 1;
-                    State newState = offensive ? State.OFFENSIVE : State.DEFENSIVE;
-                    Transition(newState);
-                    break;
+        //if (timer.Expired())
+        //{
+        //    timer.Reset();
+        //    switch (state)
+        //    {
+        //        // Neutral can transition between offensive and defensive
+        //        case State.NEUTRAL:
+        //            // Toss a coin to determine offensive vs defensive
+        //            bool offensive = Random.Range(0, 2) == 1;
+        //            State newState = offensive ? State.OFFENSIVE : State.DEFENSIVE;
+        //            Transition(newState);
+        //            break;
+        //
+        //        // Offensive & defensive can only transition back to neutral
+        //        case State.OFFENSIVE:
+        //        case State.DEFENSIVE:
+        //            Transition(State.NEUTRAL);
+        //            break;
+        //    }
+        //}
 
-                // Offensive & defensive can only transition back to neutral
-                case State.OFFENSIVE:
-                case State.DEFENSIVE:
-                    Transition(State.NEUTRAL);
-                    break;
-            }
+        // State-specific behaviour
+        switch (state)
+        {
+            case State.NEUTRAL:
+                transform.position = Vector3.MoveTowards(transform.position, waypoints[waypointIndex].position, speed * Time.deltaTime);
+                break;
+
+            case State.OFFENSIVE:
+                break;
+
+            case State.DEFENSIVE:
+                break;
         }
     }
 
     void Start()
     {
         renderer = GetComponent<SpriteRenderer>();
-        timer.total = 1.0f;
+        timer.total = 5.0f;
+        OnEnter(state);
     }
 
     void Update()
     {
         timer.Tick(Time.deltaTime);
         OnUpdate();
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log(collision.gameObject.name);
+        ++waypointIndex;
+        waypointIndex %= waypoints.Length;
     }
 }
