@@ -145,6 +145,7 @@ public class Player : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        onWeaponSwitch(collision.tag);
+        // Commented to make AI state scene work
+        //onWeaponSwitch(collision.tag);
     }
 }

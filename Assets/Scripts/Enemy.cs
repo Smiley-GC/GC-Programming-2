@@ -7,6 +7,8 @@ using UnityEngine;
 // Conditions --> timeout
 public class Enemy : MonoBehaviour
 {
+    public GameObject player;
+
     public Transform[] waypoints;
     int waypointIndex = 0;
     float speed = 10.0f;
@@ -53,6 +55,7 @@ public class Enemy : MonoBehaviour
     // State-specific per-frame behaviour!
     void OnUpdate()
     {
+        // Time-based transition was just for example, now transitioning based on proximity
         // *Condition* to transition state
         //if (timer.Expired())
         //{
@@ -105,8 +108,22 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.name);
-        ++waypointIndex;
-        waypointIndex %= waypoints.Length;
+        if (collision.CompareTag("Waypoint"))
+        {
+            ++waypointIndex;
+            waypointIndex %= waypoints.Length;
+        }
+        if (collision.CompareTag("Player"))
+        {
+            Transition(State.OFFENSIVE);
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            Transition(State.NEUTRAL);
+        }
     }
 }

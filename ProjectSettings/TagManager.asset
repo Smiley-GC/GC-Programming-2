@@ -7,6 +7,7 @@ TagManager:
   - Rifle
   - Shotgun
   - Grenade
+  - Waypoint
   layers:
   - Default
   - TransparentFX
