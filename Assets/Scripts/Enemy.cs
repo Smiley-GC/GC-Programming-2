@@ -16,16 +16,18 @@ public class Enemy : MonoBehaviour
 
     public State state = State.NEUTRAL;
     SpriteRenderer renderer;
+    Timer timer = new Timer();
 
-    void Start()
+    void Transition(State newState)
     {
-        renderer = GetComponent<SpriteRenderer>();
+        // TODO -- add on exit
+        OnEnter(newState);
     }
 
-    void Update()
+    void OnEnter(State newState)
     {
         Color color = Color.white;
-        switch (state)
+        switch (newState)
         {
             case State.NEUTRAL:
                 color = Color.grey;
@@ -40,5 +42,45 @@ public class Enemy : MonoBehaviour
                 break;
         }
         renderer.color = color;
+        state = newState;
+        Debug.Log(state);
+    }
+
+    // State-specific per-frame behaviour!
+    void OnUpdate()
+    {
+        // *Condition* to transition state
+        if (timer.Expired())
+        {
+            timer.Reset();
+            switch (state)
+            {
+                // Neutral can transition between offensive and defensive
+                case State.NEUTRAL:
+                    // Toss a coin to determine offensive vs defensive
+                    bool offensive = Random.Range(0, 2) == 1;
+                    State newState = offensive ? State.OFFENSIVE : State.DEFENSIVE;
+                    Transition(newState);
+                    break;
+
+                // Offensive & defensive can only transition back to neutral
+                case State.OFFENSIVE:
+                case State.DEFENSIVE:
+                    Transition(State.NEUTRAL);
+                    break;
+            }
+        }
+    }
+
+    void Start()
+    {
+        renderer = GetComponent<SpriteRenderer>();
+        timer.total = 1.0f;
+    }
+
+    void Update()
+    {
+        timer.Tick(Time.deltaTime);
+        OnUpdate();
     }
 }
