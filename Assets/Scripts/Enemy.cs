@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public Transform player;
+
     public Transform[] waypoints;
     int nextWaypoint = 0;
     float speed = 10.0f;
@@ -19,9 +21,13 @@ public class Enemy : MonoBehaviour
 
     void Transition(State newState)
     {
-        OnExit(state);
-        state = newState;
-        OnEnter(state);
+        // Don't re-transition to the same state (ensure OnEnter & OnExit are only called *once*)
+        if (state != newState)
+        {
+            OnExit(state);
+            state = newState;
+            OnEnter(state);
+        }
     }
 
     void OnEnter(State newState)
@@ -77,7 +83,9 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        Transition(State.NEUTRAL);
+        // Since transition doesn't run if state == newState, simply call OnEnter!
+        //Transition(State.NEUTRAL);
+        OnEnter(State.NEUTRAL);
     }
 
     void Update()
@@ -104,15 +112,32 @@ public class Enemy : MonoBehaviour
     {
         // Waypoint collision test
         //Debug.Log(collision.name);
-        nextWaypoint++;
 
-        // Style level 1
-        //if (nextWaypoint >= waypoints.Length) nextWaypoint = 0;
+        if (collision.CompareTag("Waypoint"))
+        {
+            nextWaypoint++;
 
-        // Style level 2
-        //nextWaypoint = nextWaypoint >= waypoints.Length ? 0 : nextWaypoint;
+            // Style level 1
+            //if (nextWaypoint >= waypoints.Length) nextWaypoint = 0;
 
-        // Style level 3
-        nextWaypoint %= waypoints.Length;
+            // Style level 2
+            //nextWaypoint = nextWaypoint >= waypoints.Length ? 0 : nextWaypoint;
+
+            // Style level 3
+            nextWaypoint %= waypoints.Length;
+        }
+
+        if (collision.CompareTag("Player"))
+        {
+            Transition(State.OFFENSIVE);
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            Transition(State.NEUTRAL);
+        }
     }
 }
