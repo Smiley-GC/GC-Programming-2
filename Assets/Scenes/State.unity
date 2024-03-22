@@ -360,6 +360,7 @@ MonoBehaviour:
   - {fileID: 307558602}
   - {fileID: 1747778316}
   - {fileID: 379235073}
+  weaponPrefab: {fileID: 7706644482599158409, guid: 9b51636d02d6b7e459d1be6ccf59d2a2, type: 3}
 --- !u!50 &725778991
 Rigidbody2D:
   serializedVersion: 4

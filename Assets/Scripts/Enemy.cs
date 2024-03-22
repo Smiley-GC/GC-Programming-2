@@ -10,6 +10,10 @@ public class Enemy : MonoBehaviour
     int nextWaypoint = 0;
     float speed = 10.0f;
 
+    public GameObject weaponPrefab;
+    Weapon weapon = new Grenade();
+    Timer shootTimer = new Timer();
+
     public enum State
     {
         NEUTRAL,
@@ -74,6 +78,13 @@ public class Enemy : MonoBehaviour
                 break;
 
             case State.OFFENSIVE:
+                shootTimer.Tick(Time.deltaTime);
+                if (shootTimer.Expired())
+                {
+                    Vector3 direction = (player.position - transform.position).normalized;
+                    shootTimer.Reset();
+                    weapon.Fire(transform.position + transform.right, direction);
+                }
                 break;
 
             case State.DEFENSIVE:
@@ -86,6 +97,9 @@ public class Enemy : MonoBehaviour
         // Since transition doesn't run if state == newState, simply call OnEnter!
         //Transition(State.NEUTRAL);
         OnEnter(State.NEUTRAL);
+
+        weapon.prefab = weaponPrefab;
+        shootTimer.total = 0.1f;
     }
 
     void Update()
