@@ -102,8 +102,17 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.name);
+        // Waypoint collision test
+        //Debug.Log(collision.name);
         nextWaypoint++;
-        if (nextWaypoint >= waypoints.Length) nextWaypoint = 0;
+
+        // Style level 1
+        //if (nextWaypoint >= waypoints.Length) nextWaypoint = 0;
+
+        // Style level 2
+        //nextWaypoint = nextWaypoint >= waypoints.Length ? 0 : nextWaypoint;
+
+        // Style level 3
+        nextWaypoint %= waypoints.Length;
     }
 }
