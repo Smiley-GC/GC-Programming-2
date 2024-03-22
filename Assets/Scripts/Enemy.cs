@@ -5,6 +5,8 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public Transform[] waypoints;
+    int nextWaypoint = 0;
+    float speed = 10.0f;
 
     public enum State
     {
@@ -56,7 +58,21 @@ public class Enemy : MonoBehaviour
     // in case we need to handle some state-specific transitions
     void OnUpdate()
     {
+        switch (state)
+        {
+            case State.NEUTRAL:
+                Vector3 current = transform.position;
+                Vector3 target = waypoints[nextWaypoint].position;
+                float distance = speed * Time.deltaTime;
+                transform.position = Vector3.MoveTowards(current, target, distance);
+                break;
 
+            case State.OFFENSIVE:
+                break;
+
+            case State.DEFENSIVE:
+                break;
+        }
     }
 
     void Start()
@@ -87,5 +103,7 @@ public class Enemy : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log(collision.name);
+        nextWaypoint++;
+        if (nextWaypoint >= waypoints.Length) nextWaypoint = 0;
     }
 }
