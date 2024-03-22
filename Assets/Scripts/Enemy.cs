@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public Transform[] waypoints;
+
     public enum State
     {
         NEUTRAL,
@@ -80,5 +82,10 @@ public class Enemy : MonoBehaviour
         {
             Transition(State.DEFENSIVE);
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log(collision.name);
     }
 }
