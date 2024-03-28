@@ -32,6 +32,10 @@ public class Enemy : MonoBehaviour
             state = newState;
             OnEnter(state);
         }
+        else
+        {
+            Debug.LogError("Error -- re-transitioning to same state. Check yo self bro!!!");
+        }
     }
 
     void OnEnter(State newState)
@@ -59,6 +63,8 @@ public class Enemy : MonoBehaviour
         //GetComponent<SpriteRenderer>().color = colors[(int)newState];
     }
 
+    // TODO -- acquire nearest waypoint when transitioning to neutral
+    // Probably better in Neutral on-enter
     void OnExit(State previousState)
     {
 
@@ -81,8 +87,8 @@ public class Enemy : MonoBehaviour
                 shootTimer.Tick(Time.deltaTime);
                 if (shootTimer.Expired())
                 {
-                    Vector3 direction = (player.position - transform.position).normalized;
                     shootTimer.Reset();
+                    Vector3 direction = (player.position - transform.position).normalized;
                     weapon.Fire(transform.position + transform.right, direction);
                 }
                 break;
@@ -96,7 +102,8 @@ public class Enemy : MonoBehaviour
     {
         // Since transition doesn't run if state == newState, simply call OnEnter!
         //Transition(State.NEUTRAL);
-        OnEnter(State.NEUTRAL);
+        state = State.NEUTRAL;
+        OnEnter(state);
 
         weapon.prefab = weaponPrefab;
         shootTimer.total = 0.1f;
@@ -106,17 +113,17 @@ public class Enemy : MonoBehaviour
     {
         OnUpdate();
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.I))
         {
             Transition(State.NEUTRAL);
         }
 
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.O))
         {
             Transition(State.OFFENSIVE);
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             Transition(State.DEFENSIVE);
         }
@@ -124,20 +131,9 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        // Waypoint collision test
-        //Debug.Log(collision.name);
-
         if (collision.CompareTag("Waypoint"))
         {
             nextWaypoint++;
-
-            // Style level 1
-            //if (nextWaypoint >= waypoints.Length) nextWaypoint = 0;
-
-            // Style level 2
-            //nextWaypoint = nextWaypoint >= waypoints.Length ? 0 : nextWaypoint;
-
-            // Style level 3
             nextWaypoint %= waypoints.Length;
         }
 
