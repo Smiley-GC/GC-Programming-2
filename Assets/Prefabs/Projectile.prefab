@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3481642654898397935}
   m_Layer: 0
   m_Name: Projectile
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,7 +116,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -161,5 +161,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe32c9209675cfa4bba5d4385eb9442a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: 0
   particlePrefab: {fileID: 2900119631548366508, guid: dd08ee78be2fa7f4ea49de0470c853ef, type: 3}
-  isGrenade: 0
+  weaponType: 0

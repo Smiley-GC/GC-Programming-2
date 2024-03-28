@@ -5,14 +5,20 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public Transform player;
+    public Collider2D hurtBox;
+    public Collider2D detector;
 
     public Transform[] waypoints;
     int nextWaypoint = 0;
     float speed = 10.0f;
 
+    // TODO -- add recursive explosion count to make grenade explosion do damage
+    //Weapon weapon = new Grenade();
     public GameObject weaponPrefab;
-    Weapon weapon = new Grenade();
+    Weapon weapon = new Rifle();
     Timer shootTimer = new Timer();
+
+    public float health = 100.0f;
 
     public enum State
     {
@@ -34,7 +40,7 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Error -- re-transitioning to same state. Check yo self bro!!!");
+            //Debug.LogError("Error -- re-transitioning to same state. Check yo self bro!!!");
         }
     }
 
@@ -89,7 +95,7 @@ public class Enemy : MonoBehaviour
                 {
                     shootTimer.Reset();
                     Vector3 direction = (player.position - transform.position).normalized;
-                    weapon.Fire(transform.position + transform.right, direction);
+                    weapon.Fire(transform.position + direction, direction);
                 }
                 break;
 
@@ -105,13 +111,15 @@ public class Enemy : MonoBehaviour
         state = State.NEUTRAL;
         OnEnter(state);
 
+        weapon.owner = Owner.ENEMY;
         weapon.prefab = weaponPrefab;
-        shootTimer.total = 0.1f;
+        shootTimer.total = 1.0f;
     }
 
     void Update()
     {
-        OnUpdate();
+        if (health > 0.0f)
+            OnUpdate();
 
         if (Input.GetKeyDown(KeyCode.I))
         {
@@ -138,6 +146,12 @@ public class Enemy : MonoBehaviour
         }
 
         if (collision.CompareTag("Player"))
+        {
+            Transition(State.OFFENSIVE);
+        }
+
+        // TODO -- tell projectiles who they belong to
+        if (collision.CompareTag("Projectile"))
         {
             Transition(State.OFFENSIVE);
         }

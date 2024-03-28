@@ -8,6 +8,7 @@ public abstract class Weapon
     public GameObject prefab;
     public float speed;
     public Color color;
+    public Owner owner = Owner.NONE;
 
     // Optional fun variables:
     public float turnRate;
@@ -28,6 +29,7 @@ public abstract class Weapon
         projectile.transform.position = position + direction;
         projectile.GetComponent<Rigidbody2D>().velocity = direction * speed;
         projectile.GetComponent<SpriteRenderer>().color = color;
+        projectile.GetComponent<Projectile>().owner = owner;
         return projectile;
     }
 }
@@ -77,7 +79,7 @@ public class Grenade : Weapon
     public override void Fire(Vector3 position, Vector3 direction)
     {
         GameObject explosion = CreateProjectile(position, direction);
-        explosion.GetComponent<Explosion>().weaponType = WeaponType.GRENADE;
+        explosion.GetComponent<Projectile>().weaponType = WeaponType.GRENADE;
         Object.Destroy(explosion, 1.0f);
     }
 }

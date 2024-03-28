@@ -8,6 +8,8 @@ TagManager:
   - Shotgun
   - Grenade
   - Waypoint
+  - Projectile
+  - Enemy
   layers:
   - Default
   - TransparentFX

@@ -2,11 +2,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Explosion : MonoBehaviour
+public enum Owner
 {
+    NONE,
+    PLAYER,
+    ENEMY
+}
+
+public class Projectile : MonoBehaviour
+{
+    public Owner owner = Owner.NONE;
+
     public GameObject particlePrefab;
     public WeaponType weaponType;
 
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player") && owner != Owner.PLAYER)
+        {
+            Player player = collision.GetComponent<Player>();
+            player.health -= 25.0f;
+            if (player.health <= 0.0f)
+                Debug.LogWarning("Player died");
+        }
+
+        if (collision.name == "HurtBox" && owner != Owner.ENEMY)
+        {
+            Enemy enemy = collision.GetComponentInParent<Enemy>();
+            enemy.health -= 25.0f;
+            if (enemy.health <= 0.0f)
+                 Debug.LogWarning("Enemy died");
+
+            Destroy(gameObject);
+        }
+    }
+
+    // Explode if grenade
     void OnDestroy()
     {
         switch (weaponType)
