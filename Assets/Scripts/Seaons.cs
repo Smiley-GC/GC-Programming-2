@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Seaons : MonoBehaviour
@@ -14,14 +15,17 @@ public class Seaons : MonoBehaviour
 
     Season state = Season.WINTER;
 
+    Timer timer = new Timer();
+
     void Start()
     {
+        timer.total = 3.0f;
         Transition(Season.SPRING);
     }
 
     void Update()
     {
-        
+        OnUpdate();
     }
 
     void Transition(Season newState)
@@ -76,6 +80,30 @@ public class Seaons : MonoBehaviour
 
     void OnUpdate()
     {
+        // Exact same condition for all 4 transitions
+        // (this is rarely the case in actual video games, our AI for example)
+        timer.Tick(Time.deltaTime);
+        if (timer.Expired())
+        {
+            timer.Reset();
+            switch (state)
+            {
+                case Season.WINTER:
+                    Transition(Season.SPRING);
+                    break;
 
+                case Season.SPRING:
+                    Transition(Season.SUMMER);
+                    break;
+
+                case Season.SUMMER:
+                    Transition(Season.FALL);
+                    break;
+
+                case Season.FALL:
+                    Transition(Season.WINTER);
+                    break;
+            }
+        }
     }
 }
