@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Seaons : MonoBehaviour
 {
-    public enum Season
+    public enum Season : int
     {
         WINTER,
         SPRING,
@@ -86,24 +86,30 @@ public class Seaons : MonoBehaviour
         if (timer.Expired())
         {
             timer.Reset();
-            switch (state)
-            {
-                case Season.WINTER:
-                    Transition(Season.SPRING);
-                    break;
 
-                case Season.SPRING:
-                    Transition(Season.SUMMER);
-                    break;
+            // "Clever" way of expressing transitions since states are sequential
+            int newState = ((int)state + 1) % 4;
+            Transition((Season)newState);
 
-                case Season.SUMMER:
-                    Transition(Season.FALL);
-                    break;
-
-                case Season.FALL:
-                    Transition(Season.WINTER);
-                    break;
-            }
+            // Textbook way of transitioning
+            //switch (state)
+            //{
+            //    case Season.WINTER:
+            //        Transition(Season.SPRING);
+            //        break;
+            //
+            //    case Season.SPRING:
+            //        Transition(Season.SUMMER);
+            //        break;
+            //
+            //    case Season.SUMMER:
+            //        Transition(Season.FALL);
+            //        break;
+            //
+            //    case Season.FALL:
+            //        Transition(Season.WINTER);
+            //        break;
+            //}
         }
     }
 }
