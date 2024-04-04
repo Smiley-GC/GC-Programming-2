@@ -12,6 +12,13 @@ public class TileGrid : MonoBehaviour
 {
     abstract class Command
     {
+        public Command(Cell cell, int rows, int cols)
+        {
+            mCell = cell;
+            mRows = rows;
+            mCols = cols;
+        }
+
         // Run is called externally so its public
         public abstract void Run();
         public abstract void Undo();
@@ -19,7 +26,7 @@ public class TileGrid : MonoBehaviour
         // Nothing but Move uses CanMove, so CanMove should be private
         private bool CanMove(Cell cell)
         {
-            return cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows;
+            return cell.col >= 0 && cell.col < mCols && cell.row >= 0 && cell.row < mRows;
         }
         
         // Move is used by derived classes so its protected
@@ -30,74 +37,41 @@ public class TileGrid : MonoBehaviour
             // Hence, we must manually change the row & col of our cell!
             if (CanMove(newCell))
             {
-                cell.row = newCell.row;
-                cell.col = newCell.col;
+                mCell.row = newCell.row;
+                mCell.col = newCell.col;
             }
         }
 
-        public int rows;
-        public int cols;
-        public Cell cell;
+        private int mRows;
+        private int mCols;
+        protected Cell mCell;
     }
 
-    class LeftCommand : Command
+    class MoveCommand : Command
     {
+        public MoveCommand(int dy, int dx, Cell cell, int rows, int cols) : base(cell, rows, cols)
+        {
+            mDy = dy;
+            mDx = dx;
+        }
+
         public override void Run()
         {
-            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
-            Move(newCell);
+            // Since classes are references, this makes it so every time mCell changes, mPrevious changes.
+            // Instead, we must make mPrevious a copy of mCell so we have revision history!
+            //mPrevious = mCell;
+            mPrevious = new Cell { col = mCell.col, row = mCell.row };
+            Move(new Cell { col = mCell.col + mDx, row = mCell.row + mDy });
         }
 
         public override void Undo()
         {
-            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
-            Move(newCell);
-        }
-    }
-
-    class RightCommand : Command
-    {
-        public override void Run()
-        {
-            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
-            Move(newCell);
+            Move(mPrevious);
         }
 
-        public override void Undo()
-        {
-            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
-            Move(newCell);
-        }
-    }
-
-    class UpCommand : Command
-    {
-        public override void Run()
-        {
-            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
-            Move(newCell);
-        }
-
-        public override void Undo()
-        {
-            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
-            Move(newCell);
-        }
-    }
-
-    class DownCommand : Command
-    {
-        public override void Run()
-        {
-            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
-            Move(newCell);
-        }
-
-        public override void Undo()
-        {
-            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
-            Move(newCell);
-        }
+        private Cell mPrevious;
+        private int mDy;
+        private int mDx;
     }
 
     public GameObject tilePrefab;
@@ -158,50 +132,26 @@ public class TileGrid : MonoBehaviour
             }
         }
 
-        //int dx = 0;
-        //int dy = 0;
-        //if (Input.GetKeyDown(KeyCode.W))
-        //{
-        //    dy = -1;
-        //}
-        //else if (Input.GetKeyDown(KeyCode.S))
-        //{
-        //    dy = 1;
-        //}
-        //else if (Input.GetKeyDown(KeyCode.A))
-        //{
-        //    dx = -1;
-        //}
-        //else if (Input.GetKeyDown(KeyCode.D))
-        //{
-        //    dx = 1;
-        //}
-        //Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
-        //player = CanMove(newPlayer) ? newPlayer : player;
-
         Command command = null;
         if (Input.GetKeyDown(KeyCode.W))
         {
-            command = new UpCommand();
+            command = new MoveCommand(-1, 0, player, rows, cols);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            command = new DownCommand();
+            command = new MoveCommand(1, 0, player, rows, cols);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            command = new LeftCommand();
+            command = new MoveCommand(0, -1, player, rows, cols);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            command = new RightCommand();
+            command = new MoveCommand(0, 1, player, rows, cols);
         }
 
         if (command != null)
         {
-            command.rows = rows;
-            command.cols = cols;
-            command.cell = player;
             command.Run();
             commands.Add(command);
         }
@@ -213,22 +163,6 @@ public class TileGrid : MonoBehaviour
         }
 
         ColorTile(player, Color.magenta);
-
-        // Uncomment for lab 4 solution
-        // Mouse --> screen space --> world space --> grid space
-        //Vector2 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //int mouseRow = (tileTypes.GetLength(0) - 1) - (int)mouse.y;
-        //int mouseCol = (int)mouse.x;
-        //mouseRow = Mathf.Clamp(mouseRow, 0, rows - 1);
-        //mouseCol = Mathf.Clamp(mouseCol, 0, cols - 1);
-        //Clairvoyance(new Cell { row = mouseRow, col = mouseCol });
-    }
-
-    bool CanMove(Cell cell)
-    {
-        int rows = tileTypes.GetLength(0);
-        int cols = tileTypes.GetLength(1);
-        return cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows;
     }
 
     void ColorTile(Cell cell, Color color)
