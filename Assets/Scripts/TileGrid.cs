@@ -8,6 +8,12 @@ public class Cell
     public int col;
 }
 
+public struct CellValue
+{
+    public int row;
+    public int col;
+}
+
 public class TileGrid : MonoBehaviour
 {
     abstract class Command
@@ -96,6 +102,17 @@ public class TileGrid : MonoBehaviour
 
     void Start()
     {
+        // Value (struct) vs reference (class) refresher
+        Cell c0 = new Cell { row = 0, col = 0 };
+        Cell c1 = c0;
+        c0.row = 69;
+        c0.col = 420;
+
+        CellValue cv0 = new CellValue {  row = 0, col = 0 };
+        CellValue cv1 = cv0;
+        cv0.row = 69;
+        cv0.col = 420;
+
         int rows = tileTypes.GetLength(0);
         int cols = tileTypes.GetLength(1);
         float xStart = 0.5f;
