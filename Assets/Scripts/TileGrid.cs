@@ -85,33 +85,39 @@ public class TileGrid : MonoBehaviour
 
     int[,] tileTypes =
     {
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
+
+    int[,] previous = new int[10, 20];
 
     List<Command> commands = new List<Command>();
     Cell player = new Cell { row = 4, col = 9 };
 
+    Timer timer = new Timer();
+
     void Start()
     {
         // Value (struct) vs reference (class) refresher
-        Cell c0 = new Cell { row = 0, col = 0 };
-        Cell c1 = c0;
-        c0.row = 69;
-        c0.col = 420;
+        //Cell c0 = new Cell { row = 0, col = 0 };
+        //Cell c1 = c0;
+        //c0.row = 69;
+        //c0.col = 420;
+        //
+        //CellValue cv0 = new CellValue {  row = 0, col = 0 };
+        //CellValue cv1 = cv0;
+        //cv0.row = 69;
+        //cv0.col = 420;
 
-        CellValue cv0 = new CellValue {  row = 0, col = 0 };
-        CellValue cv1 = cv0;
-        cv0.row = 69;
-        cv0.col = 420;
+        timer.total = 0.1f;
 
         int rows = tileTypes.GetLength(0);
         int cols = tileTypes.GetLength(1);
@@ -138,48 +144,82 @@ public class TileGrid : MonoBehaviour
 
     void Update()
     {
-        // Revert colour of every tile to white
-        int rows = tileTypes.GetLength(0);
-        int cols = tileTypes.GetLength(1);
-        for (int row = 0; row < rows; row++)
+        if (timer.Expired())
         {
-            for (int col = 0; col < cols; col++)
+            timer.Reset();
+            int rows = tileTypes.GetLength(0);
+            int cols = tileTypes.GetLength(1);
+            
+            for (int row = 0; row < rows; row++)
             {
-                tiles[row][col].GetComponent<SpriteRenderer>().color = Color.white;
+                for (int col = 0; col < cols; col++)
+                {
+                    previous[row, col] = tileTypes[row, col];
+                }
+            }
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    Cell cell = new Cell { col = col, row = row };
+                    int aliveCount = AliveNeighbours(cell);
+
+                    // Die from under-polulation or over-population
+                    if (aliveCount < 2 || aliveCount > 3)
+                    {
+                        tileTypes[cell.row, cell.col] = 0;
+                    }
+
+                    // Resurrect if exactly 3 alive neighbours (doesn't matter if we make a previously alive cell alive)
+                    else if (aliveCount == 3)
+                        tileTypes[cell.row, cell.col] = 1;
+
+                    Color color = tileTypes[row, col] == 1 ? Color.white : Color.black;
+                    tiles[row][col].GetComponent<SpriteRenderer>().color = color;
+                }
             }
         }
+        timer.Tick(Time.deltaTime);
 
-        Command command = null;
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            command = new MoveCommand(-1, 0, player, rows, cols);
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            command = new MoveCommand(1, 0, player, rows, cols);
-        }
-        else if (Input.GetKeyDown(KeyCode.A))
-        {
-            command = new MoveCommand(0, -1, player, rows, cols);
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            command = new MoveCommand(0, 1, player, rows, cols);
-        }
+        // Neighbours diagonals test
+        //List<Cell> cells = Neighbours(new Cell { row = 4, col = 9 });
+        //foreach (Cell cell in cells)
+        //{
+        //    tiles[cell.row][cell.col].GetComponent<SpriteRenderer>().color = Color.white;
+        //}
 
-        if (command != null)
-        {
-            command.Run();
-            commands.Add(command);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Z) && commands.Count > 0)
-        {
-            commands[commands.Count - 1].Undo();
-            commands.RemoveAt(commands.Count - 1);
-        }
-
-        ColorTile(player, Color.magenta);
+        //Command command = null;
+        //if (Input.GetKeyDown(KeyCode.W))
+        //{
+        //    command = new MoveCommand(-1, 0, player, rows, cols);
+        //}
+        //else if (Input.GetKeyDown(KeyCode.S))
+        //{
+        //    command = new MoveCommand(1, 0, player, rows, cols);
+        //}
+        //else if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    command = new MoveCommand(0, -1, player, rows, cols);
+        //}
+        //else if (Input.GetKeyDown(KeyCode.D))
+        //{
+        //    command = new MoveCommand(0, 1, player, rows, cols);
+        //}
+        //
+        //if (command != null)
+        //{
+        //    command.Run();
+        //    commands.Add(command);
+        //}
+        //
+        //if (Input.GetKeyDown(KeyCode.Z) && commands.Count > 0)
+        //{
+        //    commands[commands.Count - 1].Undo();
+        //    commands.RemoveAt(commands.Count - 1);
+        //}
+        //
+        //ColorTile(player, Color.magenta);
     }
 
     void ColorTile(Cell cell, Color color)
@@ -198,6 +238,18 @@ public class TileGrid : MonoBehaviour
         foreach (Cell neighbour in Neighbours(cell))
             ColorTile(neighbour);
         ColorTile(cell, Color.magenta);
+    }
+
+    int AliveNeighbours(Cell cell)
+    {
+        List<Cell> neighbours = Neighbours(cell);
+        int aliveCount = 0;
+        foreach (Cell neighbour in neighbours)
+        {
+            if (previous[neighbour.row, neighbour.col] == 1)
+                aliveCount++;
+        }
+        return aliveCount;
     }
 
     // Returns left-right-up-down cell of the passed in cell
@@ -223,6 +275,18 @@ public class TileGrid : MonoBehaviour
 
         if (down < rows)
             neighbours.Add(new Cell { row = down, col = cell.col });
+
+        if (left >= 0 && up >= 0)
+            neighbours.Add(new Cell { row = up, col = left });
+
+        if (right < cols && up >= 0)
+            neighbours.Add(new Cell { row = up, col = right });
+
+        if (left >= 0 && down < rows)
+            neighbours.Add(new Cell { row = down, col = left });
+
+        if (right < cols && down < rows)
+            neighbours.Add(new Cell { row = down, col = right });
 
         return neighbours;
     }
