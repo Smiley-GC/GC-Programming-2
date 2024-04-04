@@ -5,6 +5,9 @@ using UnityEngine;
 public class PlatformerController : MonoBehaviour
 {
     Rigidbody2D rb;
+    const int jumpCount = 2;
+    int jumps = jumpCount;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -12,8 +15,9 @@ public class PlatformerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.W) && jumps > 0)
         {
+            jumps--;
             rb.AddForce(Vector3.up * 15.0f, ForceMode2D.Impulse);
         }
         if (Input.GetKey(KeyCode.A))
@@ -24,5 +28,11 @@ public class PlatformerController : MonoBehaviour
         {
             rb.AddForce(Vector3.right);
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Consider separating platforms by Ground vs Wall tags to prevent infinite wall jumping
+        jumps = jumpCount;
     }
 }
