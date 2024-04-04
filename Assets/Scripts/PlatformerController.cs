@@ -14,7 +14,7 @@ public class PlatformerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.W))
         {
-
+            rb.AddForce(Vector3.up * 15.0f, ForceMode2D.Impulse);
         }
         if (Input.GetKey(KeyCode.A))
         {
