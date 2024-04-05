@@ -145,6 +145,16 @@ public class TileGrid : MonoBehaviour
         {
             for (int col = 0; col < cols; col++)
             {
+                Cell cell = new Cell { row = row, col = col };
+                int aliveCount = AliveNeighbours(cell);
+
+                // Dies due to under-population if less than 2, dies due to over-population if more than 3
+                tileTypes[cell.row, cell.col] = aliveCount == 2 || aliveCount == 3 ? 1 : 0;
+
+                // Resurrects if dead and has exactly 3 alive neighbours!
+                if (tileTypes[cell.row, cell.col] == 0 && aliveCount == 3)
+                    tileTypes[cell.row, cell.col] = 1;
+
                 Color color = tileTypes[row, col] == 1 ? Color.white : Color.black;
                 tiles[row][col].GetComponent<SpriteRenderer>().color = color;
             }
@@ -209,6 +219,17 @@ public class TileGrid : MonoBehaviour
         foreach (Cell neighbour in Neighbours(cell))
             ColorTile(neighbour);
         ColorTile(cell, Color.magenta);
+    }
+
+    int AliveNeighbours(Cell cell)
+    {
+        int aliveCount = 0;
+        foreach (Cell neighbour in Neighbours(cell))
+        {
+            if (tileTypes[neighbour.row, neighbour.col] == 1)
+                aliveCount++;
+        }
+        return aliveCount;
     }
 
     // Returns left-right-up-down cell of the passed in cell
