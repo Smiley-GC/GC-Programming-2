@@ -75,7 +75,7 @@ public class TileGrid : MonoBehaviour
     public GameObject tilePrefab;
     List<List<GameObject>> tiles = new List<List<GameObject>>();
 
-    int[,] tileTypes =
+    int[,] current =
     {
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -88,9 +88,11 @@ public class TileGrid : MonoBehaviour
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
+    int[,] previous = new int[10, 20];
 
     List<Command> commands = new List<Command>();
     Cell player = new Cell { row = 4, col = 9 };
+    Timer timer = new Timer();
 
     void Start()
     {
@@ -107,8 +109,8 @@ public class TileGrid : MonoBehaviour
         // Only cv0's row is 42
         cv0.row = 42;
 
-        int rows = tileTypes.GetLength(0);
-        int cols = tileTypes.GetLength(1);
+        int rows = current.GetLength(0);
+        int cols = current.GetLength(1);
         float xStart = 0.5f;
         float yStart = 0.5f + (rows - 1);
         float x = xStart;
@@ -132,33 +134,56 @@ public class TileGrid : MonoBehaviour
         // Set the initial pattern
         foreach (Cell cell in Neighbours(new Cell { row = 4, col = 9 }))
         {
-            tileTypes[cell.row, cell.col] = 1;
+            previous[cell.row, cell.col] = 1;
         }
+
+        timer.total = 0.1f;
     }
 
     void Update()
     {
         // Revert colour of every tile to white
-        int rows = tileTypes.GetLength(0);
-        int cols = tileTypes.GetLength(1);
-        for (int row = 0; row < rows; row++)
+        int rows = current.GetLength(0);
+        int cols = current.GetLength(1);
+        if (timer.Expired())
         {
-            for (int col = 0; col < cols; col++)
+            timer.Reset();
+            for (int row = 0; row < rows; row++)
             {
-                Cell cell = new Cell { row = row, col = col };
-                int aliveCount = AliveNeighbours(cell);
+                for (int col = 0; col < cols; col++)
+                {
+                    Cell cell = new Cell { row = row, col = col };
+                    int aliveCount = AliveNeighbours(cell);
 
-                // Dies due to under-population if less than 2, dies due to over-population if more than 3
-                tileTypes[cell.row, cell.col] = aliveCount == 2 || aliveCount == 3 ? 1 : 0;
+                    // Dies due to under-population if less than 2, dies due to over-population if more than 3
+                    if (aliveCount < 2 || aliveCount > 3)
+                    {
+                        current[cell.row, cell.col] = 0;
+                    }
+                    else
+                    {
+                        current[cell.row, cell.col] = 1;
+                    }
 
-                // Resurrects if dead and has exactly 3 alive neighbours!
-                if (tileTypes[cell.row, cell.col] == 0 && aliveCount == 3)
-                    tileTypes[cell.row, cell.col] = 1;
+                    // Resurrects if dead and has exactly 3 alive neighbours!
+                    if (previous[cell.row, cell.col] == 0 && aliveCount == 3)
+                        current[cell.row, cell.col] = 1;
 
-                Color color = tileTypes[row, col] == 1 ? Color.white : Color.black;
-                tiles[row][col].GetComponent<SpriteRenderer>().color = color;
+                    Color color = current[row, col] == 1 ? Color.white : Color.black;
+                    tiles[row][col].GetComponent<SpriteRenderer>().color = color;
+                }
+            }
+
+            // Update previous to be current after applying the rules
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    previous[row, col] = current[row, col];
+                }
             }
         }
+        timer.Tick(Time.deltaTime);
 
         /*
         Command command = null;
@@ -210,7 +235,7 @@ public class TileGrid : MonoBehaviour
 
     void ColorTile(Cell cell)
     {
-        Color color = tileTypes[cell.row, cell.col] == 1 ? Color.green : Color.red;
+        Color color = current[cell.row, cell.col] == 1 ? Color.green : Color.red;
         ColorTile(cell, color);
     }
 
@@ -226,7 +251,7 @@ public class TileGrid : MonoBehaviour
         int aliveCount = 0;
         foreach (Cell neighbour in Neighbours(cell))
         {
-            if (tileTypes[neighbour.row, neighbour.col] == 1)
+            if (previous[neighbour.row, neighbour.col] == 1)
                 aliveCount++;
         }
         return aliveCount;
@@ -235,8 +260,8 @@ public class TileGrid : MonoBehaviour
     // Returns left-right-up-down cell of the passed in cell
     List<Cell> Neighbours(Cell cell)
     {
-        int rows = tileTypes.GetLength(0);
-        int cols = tileTypes.GetLength(1);
+        int rows = current.GetLength(0);
+        int cols = current.GetLength(1);
         int left = cell.col - 1;
         int right = cell.col + 1;
         int up = cell.row - 1;
