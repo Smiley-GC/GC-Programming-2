@@ -77,16 +77,16 @@ public class TileGrid : MonoBehaviour
 
     int[,] tileTypes =
     {
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
     List<Command> commands = new List<Command>();
@@ -128,6 +128,12 @@ public class TileGrid : MonoBehaviour
             x = xStart;
             y -= 1.0f;
         }
+
+        // Set the initial pattern
+        foreach (Cell cell in Neighbours(new Cell { row = 4, col = 9 }))
+        {
+            tileTypes[cell.row, cell.col] = 1;
+        }
     }
 
     void Update()
@@ -139,31 +145,12 @@ public class TileGrid : MonoBehaviour
         {
             for (int col = 0; col < cols; col++)
             {
-                tiles[row][col].GetComponent<SpriteRenderer>().color = Color.white;
+                Color color = tileTypes[row, col] == 1 ? Color.white : Color.black;
+                tiles[row][col].GetComponent<SpriteRenderer>().color = color;
             }
         }
 
-        //int dx = 0;
-        //int dy = 0;
-        //if (Input.GetKeyDown(KeyCode.W))
-        //{
-        //    dy = -1;
-        //}
-        //else if (Input.GetKeyDown(KeyCode.S))
-        //{
-        //    dy = 1;
-        //}
-        //else if (Input.GetKeyDown(KeyCode.A))
-        //{
-        //    dx = -1;
-        //}
-        //else if (Input.GetKeyDown(KeyCode.D))
-        //{
-        //    dx = 1;
-        //}
-        //Cell newPlayer = new Cell { row = player.row + dy, col = player.col + dx };
-        //player = CanMove(newPlayer) ? newPlayer : player;
-
+        /*
         Command command = null;
         if (Input.GetKeyDown(KeyCode.W))
         {
@@ -194,7 +181,7 @@ public class TileGrid : MonoBehaviour
             commands.RemoveAt(commands.Count - 1);
         }
 
-        ColorTile(player, Color.magenta);
+        ColorTile(player, Color.magenta);*/
 
         // Uncomment for lab 4 solution
         // Mouse --> screen space --> world space --> grid space
@@ -204,13 +191,6 @@ public class TileGrid : MonoBehaviour
         //mouseRow = Mathf.Clamp(mouseRow, 0, rows - 1);
         //mouseCol = Mathf.Clamp(mouseCol, 0, cols - 1);
         //Clairvoyance(new Cell { row = mouseRow, col = mouseCol });
-    }
-
-    bool CanMove(Cell cell)
-    {
-        int rows = tileTypes.GetLength(0);
-        int cols = tileTypes.GetLength(1);
-        return cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows;
     }
 
     void ColorTile(Cell cell, Color color)
@@ -254,6 +234,18 @@ public class TileGrid : MonoBehaviour
 
         if (down < rows)
             neighbours.Add(new Cell { row = down, col = cell.col });
+
+        if (left >= 0 && up >= 0)
+            neighbours.Add(new Cell { row = up, col = left });
+
+        if (right < cols && up >= 0)
+            neighbours.Add(new Cell { row = up, col = right });
+
+        if (left >= 0 && down < rows)
+            neighbours.Add(new Cell { row = down, col = left });
+
+        if (right < cols && down < rows)
+            neighbours.Add(new Cell { row = down, col = right });
 
         return neighbours;
     }
