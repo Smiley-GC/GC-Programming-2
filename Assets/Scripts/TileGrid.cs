@@ -36,6 +36,8 @@ public class TileGrid : MonoBehaviour
 
         public override void Undo()
         {
+            Cell previous = new Cell { row = mCell.row - mDy, col = mCell.col - mDx };
+            Move(previous);
         }
 
         // Nothing but Move uses CanMove, so CanMove should be private
