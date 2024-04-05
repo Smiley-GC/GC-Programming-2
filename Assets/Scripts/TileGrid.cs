@@ -8,6 +8,12 @@ public class Cell
     public int col;
 }
 
+public struct CellValue
+{
+    public int row;
+    public int col;
+}
+
 public class TileGrid : MonoBehaviour
 {
     // This should be kept exclusively as an interface
@@ -88,6 +94,19 @@ public class TileGrid : MonoBehaviour
 
     void Start()
     {
+        // Cells are classes which are references,
+        // so when we assign one to another, they become the same object!
+        Cell c0 = new Cell { row = 69, col = 420 };
+        Cell c1 = c0;
+        // Both cell rows are 42
+        c0.row = 42;
+
+        // CellValues are structs, so they get coppied when assigned.
+        CellValue cv0 = new CellValue { row = 69, col = 420 };
+        CellValue cv1 = cv0;
+        // Only cv0's row is 42
+        cv0.row = 42;
+
         int rows = tileTypes.GetLength(0);
         int cols = tileTypes.GetLength(1);
         float xStart = 0.5f;
