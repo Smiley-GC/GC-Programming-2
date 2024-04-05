@@ -10,18 +10,40 @@ public class Cell
 
 public class TileGrid : MonoBehaviour
 {
+    // This should be kept exclusively as an interface
     abstract class Command
     {
-        // Run is called externally so its public
         public abstract void Run();
         public abstract void Undo();
+    }
+
+    class MoveCommand : Command
+    {
+        public MoveCommand(int dy, int dx, Cell cell, int rows, int cols) : base()
+        {
+            mDy = dy;
+            mDx = dx;
+            mCell = cell;
+            mRows = rows;
+            mCols = cols;
+        }
+
+        public override void Run()
+        {
+            Cell newCell = new Cell { row = mCell.row + mDy, col = mCell.col + mDx };
+            Move(newCell);
+        }
+
+        public override void Undo()
+        {
+        }
 
         // Nothing but Move uses CanMove, so CanMove should be private
         private bool CanMove(Cell cell)
         {
-            return cell.col >= 0 && cell.col < cols && cell.row >= 0 && cell.row < rows;
+            return cell.col >= 0 && cell.col < mCols && cell.row >= 0 && cell.row < mRows;
         }
-        
+
         // Move is used by derived classes so its protected
         protected void Move(Cell newCell)
         {
@@ -30,74 +52,16 @@ public class TileGrid : MonoBehaviour
             // Hence, we must manually change the row & col of our cell!
             if (CanMove(newCell))
             {
-                cell.row = newCell.row;
-                cell.col = newCell.col;
+                mCell.row = newCell.row;
+                mCell.col = newCell.col;
             }
         }
 
-        public int rows;
-        public int cols;
-        public Cell cell;
-    }
-
-    class LeftCommand : Command
-    {
-        public override void Run()
-        {
-            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
-            Move(newCell);
-        }
-
-        public override void Undo()
-        {
-            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
-            Move(newCell);
-        }
-    }
-
-    class RightCommand : Command
-    {
-        public override void Run()
-        {
-            Cell newCell = new Cell { row = cell.row, col = cell.col + 1 };
-            Move(newCell);
-        }
-
-        public override void Undo()
-        {
-            Cell newCell = new Cell { row = cell.row, col = cell.col - 1 };
-            Move(newCell);
-        }
-    }
-
-    class UpCommand : Command
-    {
-        public override void Run()
-        {
-            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
-            Move(newCell);
-        }
-
-        public override void Undo()
-        {
-            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
-            Move(newCell);
-        }
-    }
-
-    class DownCommand : Command
-    {
-        public override void Run()
-        {
-            Cell newCell = new Cell { row = cell.row + 1, col = cell.col };
-            Move(newCell);
-        }
-
-        public override void Undo()
-        {
-            Cell newCell = new Cell { row = cell.row - 1, col = cell.col };
-            Move(newCell);
-        }
+        private int mDy;
+        private int mDx;
+        private Cell mCell;
+        private int mRows;
+        private int mCols;
     }
 
     public GameObject tilePrefab;
@@ -182,26 +146,23 @@ public class TileGrid : MonoBehaviour
         Command command = null;
         if (Input.GetKeyDown(KeyCode.W))
         {
-            command = new UpCommand();
+            command = new MoveCommand(-1, 0, player, rows, cols);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            command = new DownCommand();
+            command = new MoveCommand(1, 0, player, rows, cols);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            command = new LeftCommand();
+            command = new MoveCommand(0, -1, player, rows, cols);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            command = new RightCommand();
+            command = new MoveCommand(0, 1, player, rows, cols);
         }
 
         if (command != null)
         {
-            command.rows = rows;
-            command.cols = cols;
-            command.cell = player;
             command.Run();
             commands.Add(command);
         }
