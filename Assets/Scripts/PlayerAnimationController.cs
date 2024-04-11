@@ -21,6 +21,7 @@ public class PlayerAnimationController : MonoBehaviour
 
     Animation animation;
     List<AnimationClip> clips = new List<AnimationClip>();
+    List<float> speeds = new List<float>();
     float turnSpeed = 250.0f;
     float moveSpeed = 5.0f;
 
@@ -31,6 +32,11 @@ public class PlayerAnimationController : MonoBehaviour
         clips.Add(animation.GetClip("Walking"));
         clips.Add(animation.GetClip("Fast Run"));
         clips.Add(animation.GetClip("Jump"));
+
+        speeds.Add(0.0f);
+        speeds.Add(5.0f);
+        speeds.Add(10.0f);
+        speeds.Add(69.0f);  // jump height?
         animation.clip = clips[(int)AnimationType.IDLE];
     }
 
@@ -49,11 +55,11 @@ public class PlayerAnimationController : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.W))
         {
-            translation += moveSpeed;
+            translation += 1.0f;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            translation -= moveSpeed;
+            translation -= 1.0f;
         }
 
         type = translation == 0.0f ? AnimationType.IDLE : AnimationType.WALK;
@@ -61,6 +67,7 @@ public class PlayerAnimationController : MonoBehaviour
             type = AnimationType.RUN;
 
         animation.clip = clips[(int)type];
+        translation *= speeds[(int)type];
 
         // Manual locomotion (involves understanding vectors & quaternions
         transform.rotation *= Quaternion.Euler(0.0f, rotation * dt, 0.0f);
