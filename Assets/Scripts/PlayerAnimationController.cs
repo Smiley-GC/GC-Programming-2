@@ -59,13 +59,14 @@ public class PlayerAnimationController : MonoBehaviour
         type = translation == 0.0f ? AnimationType.IDLE : AnimationType.WALK;
         animation.clip = clips[(int)type];
 
-        // Locomotion test
-        //float tt = Time.realtimeSinceStartup;
-        //transform.rotation = Quaternion.Euler(0.0f, 100.0f * tt, 0.0f);
-        //transform.Translate(transform.forward * moveSpeed * dt);
+        // Manual locomotion (involves understanding vectors & quaternions
+        transform.rotation *= Quaternion.Euler(0.0f, rotation * dt, 0.0f);
+        transform.position += transform.forward * translation * dt;
 
-        transform.Rotate(0.0f, rotation * dt, 0.0f);
-        transform.Translate(transform.forward * translation * dt);
+        // Automatic locomotion (doesn't involve anything xD)
+        //transform.Rotate(0.0f, rotation * dt, 0.0f);
+        //transform.Translate(Vector3.forward * translation * dt);
+        //transform.Translate(transform.forward * translation * dt, Space.World);
         animation.Play();
     }
 }
