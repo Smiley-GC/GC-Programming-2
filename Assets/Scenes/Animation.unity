@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 263029186}
   - component: {fileID: 263029185}
   - component: {fileID: 263029184}
+  - component: {fileID: 263029187}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -215,6 +216,15 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!45 &263029187
+Skybox:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 263029183}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1001 &328628046
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -267,6 +277,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: X Bot
       objectReference: {fileID: 0}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_Animation
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_PlayAutomatically
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_Animations.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_Animations.Array.data[0]
+      value: 
+      objectReference: {fileID: -203655887218126122, guid: ab35d03b9b5a52d4599b1068c9b4aa6b, type: 3}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_Animations.Array.data[1]
+      value: 
+      objectReference: {fileID: -203655887218126122, guid: 194b80ffe7835c44d92a2ef901080863, type: 3}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_Animations.Array.data[2]
+      value: 
+      objectReference: {fileID: -203655887218126122, guid: 891a2364579143d4fb24967507eb1b40, type: 3}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_Animations.Array.data[3]
+      value: 
+      objectReference: {fileID: -203655887218126122, guid: e4a27814795411b44868fe1458f8139f, type: 3}
+    - target: {fileID: 2223639932434330405, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
+      propertyPath: m_Animations.Array.data[4]
+      value: 
+      objectReference: {fileID: -203655887218126122, guid: 4d3ff80eab730074abc0b103845221e1, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
