@@ -62,12 +62,21 @@ public class PlayerAnimationController : MonoBehaviour
             translation -= 1.0f;
         }
 
+        // Optional homework 1: add a mechanism to prevent animation-switching while the player is jumping (otherwise animations glitch)
+        //if (Input.GetKey(KeyCode.Space))
+        //{
+        //    type = AnimationType.JUMP;
+        //}
+        
+        // Easiest way would be to add some sort of jumping check here
         type = translation == 0.0f ? AnimationType.IDLE : AnimationType.WALK;
         if (type == AnimationType.WALK && Input.GetKey(KeyCode.LeftShift))
             type = AnimationType.RUN;
 
         animation.clip = clips[(int)type];
         translation *= speeds[(int)type];
+
+        // Optional homework 2: implement a way to change animation speed that uses our AnimationType enum instead of strings.
 
         // Manual locomotion (involves understanding vectors & quaternions
         transform.rotation *= Quaternion.Euler(0.0f, rotation * dt, 0.0f);
