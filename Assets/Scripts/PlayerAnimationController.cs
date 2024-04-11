@@ -57,6 +57,9 @@ public class PlayerAnimationController : MonoBehaviour
         }
 
         type = translation == 0.0f ? AnimationType.IDLE : AnimationType.WALK;
+        if (type == AnimationType.WALK && Input.GetKey(KeyCode.LeftShift))
+            type = AnimationType.RUN;
+
         animation.clip = clips[(int)type];
 
         // Manual locomotion (involves understanding vectors & quaternions
