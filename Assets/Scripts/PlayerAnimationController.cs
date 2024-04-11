@@ -5,10 +5,19 @@ using UnityEngine;
 public class PlayerAnimationController : MonoBehaviour
 {
     // An enum is a more "correct" solution, but C# doesn't like casting enums to integers (for array access)...
-    const int IDLE = 0;
-    const int WALK = 1;
-    const int RUN = 2;
-    const int JUMP = 3;
+    //const int IDLE = 0;
+    //const int WALK = 1;
+    //const int RUN = 2;
+    //const int JUMP = 3;
+    enum AnimationType
+    {
+        IDLE,
+        WALK,
+        RUN,
+        JUMP
+    }
+
+    AnimationType type = AnimationType.IDLE;
 
     Animation animation;
     List<AnimationClip> clips = new List<AnimationClip>();
@@ -22,7 +31,7 @@ public class PlayerAnimationController : MonoBehaviour
         clips.Add(animation.GetClip("Walking"));
         clips.Add(animation.GetClip("Fast Run"));
         clips.Add(animation.GetClip("Jump"));
-        animation.clip = clips[IDLE];
+        animation.clip = clips[(int)AnimationType.IDLE];
     }
 
     void Update()
@@ -46,6 +55,15 @@ public class PlayerAnimationController : MonoBehaviour
         {
             translation -= moveSpeed;
         }
+
+        type = translation == 0.0f ? AnimationType.IDLE : AnimationType.WALK;
+        animation.clip = clips[(int)type];
+
+        // Locomotion test
+        //float tt = Time.realtimeSinceStartup;
+        //transform.rotation = Quaternion.Euler(0.0f, 100.0f * tt, 0.0f);
+        //transform.Translate(transform.forward * moveSpeed * dt);
+
         transform.Rotate(0.0f, rotation * dt, 0.0f);
         transform.Translate(transform.forward * translation * dt);
         animation.Play();
