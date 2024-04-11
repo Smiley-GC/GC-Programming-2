@@ -12,7 +12,8 @@ public class PlayerAnimationController : MonoBehaviour
 
     Animation animation;
     List<AnimationClip> clips = new List<AnimationClip>();
-
+    float turnSpeed = 250.0f;
+    float moveSpeed = 5.0f;
 
     void Start()
     {
@@ -26,6 +27,27 @@ public class PlayerAnimationController : MonoBehaviour
 
     void Update()
     {
+        float dt = Time.deltaTime;
+        float rotation = 0.0f;
+        float translation = 0.0f;
+        if (Input.GetKey(KeyCode.D))
+        {
+            rotation += turnSpeed;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            rotation -= turnSpeed;
+        }
+        if (Input.GetKey(KeyCode.W))
+        {
+            translation += moveSpeed;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            translation -= moveSpeed;
+        }
+        transform.Rotate(0.0f, rotation * dt, 0.0f);
+        transform.Translate(transform.forward * translation * dt);
         animation.Play();
     }
 }
