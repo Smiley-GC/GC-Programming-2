@@ -27,9 +27,6 @@ public class PlayerController : MonoBehaviour
         clips[(int)AnimationType.WALK] = animation.GetClip("Walking");
         clips[(int)AnimationType.RUN] = animation.GetClip("Fast Run");
         clips[(int)AnimationType.JUMP] = animation.GetClip("Jump");
-
-        animation["Walking"].speed = 0.1f;
-        animation["Idle"].speed = 0.1f;
     }
 
     void Update()
@@ -57,19 +54,16 @@ public class PlayerController : MonoBehaviour
         transform.rotation *= Quaternion.Euler(0.0f, rotation * turnSpeed * dt, 0.0f);
         //transform.Rotate(0.0f, rotation * turnSpeed * dt, 0.0f); <-- same as above
 
-        //transform.position += transform.forward * translation * moveSpeed * dt;
+        transform.position += transform.forward * translation * moveSpeed * dt;
         //transform.Translate(Vector3.forward * translation * moveSpeed * dt, Space.World); <-- same as above
 
         type = translation == 0.0f ? AnimationType.IDLE : AnimationType.WALK;
         if (type == AnimationType.WALK && Input.GetKey(KeyCode.LeftShift))
             type = AnimationType.RUN;
 
-        // TODO -- use a state machine that knows about previous animation state, call cross-fade OnEnter()
-        if (type == AnimationType.IDLE)
-        {
-            animation.CrossFade("Walking");
-        }
-        //animation["Walking"].blendMode = AnimationBlendMode.Additive;
+        // TODO -- add state to prevent animation from defaulting to idle or walk
+        //if (Input.GetKey(KeyCode.Space))
+        //    type = AnimationType.JUMP;
 
         animation.clip = clips[(int)type];
         animation.Play();
