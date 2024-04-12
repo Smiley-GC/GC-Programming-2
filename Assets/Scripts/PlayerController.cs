@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    enum AnimationType
+    public enum AnimationType
     {
         IDLE,
         WALK,
@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     }
 
     Animation animation;
-    AnimationType type = AnimationType.IDLE;
+    public AnimationType type = AnimationType.IDLE;
     AnimationClip[] clips = new AnimationClip[(int)AnimationType.COUNT];
 
     void Start()
@@ -24,11 +24,11 @@ public class PlayerController : MonoBehaviour
         clips[(int)AnimationType.WALK] = animation.GetClip("Walking");
         clips[(int)AnimationType.RUN] = animation.GetClip("Fast Run");
         clips[(int)AnimationType.JUMP] = animation.GetClip("Jump");
-        animation.clip = clips[(int)AnimationType.IDLE];
     }
 
     void Update()
     {
+        animation.clip = clips[(int)type];
         animation.Play();
     }
 }
