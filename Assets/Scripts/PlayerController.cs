@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     public AnimationType type = AnimationType.IDLE;
     AnimationClip[] clips = new AnimationClip[(int)AnimationType.COUNT];
 
+    float moveSpeed = 10.0f;
+    float turnSpeed = 250.0f;
+
     void Start()
     {
         animation = GetComponent<Animation>();
@@ -28,6 +31,32 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        float dt = Time.deltaTime;
+        float translation = 0.0f;
+        float rotation = 0.0f;
+        if (Input.GetKey(KeyCode.A))
+        {
+            rotation = -1.0f;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            rotation = 1.0f;
+        }
+        if (Input.GetKey(KeyCode.W))
+        {
+            translation = 1.0f;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            translation = -1.0f;
+        }
+
+        transform.rotation *= Quaternion.Euler(0.0f, rotation * turnSpeed * dt, 0.0f);
+        //transform.Rotate(0.0f, rotation * turnSpeed * dt, 0.0f); <-- same as above
+
+        transform.position += transform.forward * translation * moveSpeed * dt;
+        //transform.Translate(Vector3.forward * translation * moveSpeed * dt, Space.World); <-- same as above
+
         animation.clip = clips[(int)type];
         animation.Play();
     }
