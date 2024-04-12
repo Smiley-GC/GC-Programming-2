@@ -57,6 +57,8 @@ public class PlayerController : MonoBehaviour
         transform.position += transform.forward * translation * moveSpeed * dt;
         //transform.Translate(Vector3.forward * translation * moveSpeed * dt, Space.World); <-- same as above
 
+        type = translation == 0.0f ? AnimationType.IDLE : AnimationType.WALK;
+
         animation.clip = clips[(int)type];
         animation.Play();
     }
