@@ -16,7 +16,6 @@ public class PlayerAnimationController : MonoBehaviour
     AnimationType type = AnimationType.IDLE;
     List<AnimationClip> clips = new List<AnimationClip>();
     List<float> speeds = new List<float>();
-    float turnSpeed = 250.0f;
 
     void Start()
     {
@@ -35,26 +34,22 @@ public class PlayerAnimationController : MonoBehaviour
 
     void Update()
     {
-        // W = 1.0, S = -1.0, nothing = 0.0
+        // Determine state based on input
         float moveSpeed = Input.GetAxis("Vertical");
-
-        // Slow-motion
         bool slow = Input.GetKey(KeyCode.LeftControl);
-        foreach (AnimationState playback in animation)
-            playback.speed = slow ? 0.25f : 1.0f;
-
-        // Determine state based on locomotion values & input
         type = Mathf.Abs(moveSpeed) <= Mathf.Epsilon ?
             AnimationType.IDLE : AnimationType.WALK;
         if (type == AnimationType.WALK && Input.GetKey(KeyCode.LeftShift))
             type = AnimationType.RUN;
 
-        // Animate the player via state (cross-fade for simple blending)
+        // Control animation blending & playback speed
         animation.clip = clips[(int)type];
+        animation[animation.clip.name].speed = slow ? 0.25f : 1.0f;
         animation.CrossFade(animation.clip.name);
 
-        // Locomote the player via state
+        // Move the player via state
         moveSpeed *= speeds[(int)type];
+        moveSpeed *= slow ? 0.1f : 1.0f;
         if (Input.GetMouseButton(1))
         {
             float yaw = Input.GetAxis("Mouse X");
