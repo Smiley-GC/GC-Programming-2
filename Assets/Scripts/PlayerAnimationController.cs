@@ -35,25 +35,8 @@ public class PlayerAnimationController : MonoBehaviour
 
     void Update()
     {
-        float dt = Time.deltaTime;
-        float rotation = 0.0f;
-        float translation = 0.0f;
-        if (Input.GetKey(KeyCode.D))
-        {
-            rotation += turnSpeed;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            rotation -= turnSpeed;
-        }
-        if (Input.GetKey(KeyCode.W))
-        {
-            translation += 1.0f;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            translation -= 1.0f;
-        }
+        // W = 1.0, S = -1.0, nothing = 0.0
+        float moveSpeed = Input.GetAxis("Vertical");
 
         // Slow-motion
         bool slow = Input.GetKey(KeyCode.LeftControl);
@@ -61,7 +44,7 @@ public class PlayerAnimationController : MonoBehaviour
             playback.speed = slow ? 0.25f : 1.0f;
 
         // Determine state based on locomotion values & input
-        type = Mathf.Abs(translation) <= Mathf.Epsilon ?
+        type = Mathf.Abs(moveSpeed) <= Mathf.Epsilon ?
             AnimationType.IDLE : AnimationType.WALK;
         if (type == AnimationType.WALK && Input.GetKey(KeyCode.LeftShift))
             type = AnimationType.RUN;
@@ -71,8 +54,13 @@ public class PlayerAnimationController : MonoBehaviour
         animation.CrossFade(animation.clip.name);
 
         // Locomote the player via state
-        translation *= speeds[(int)type];
-        transform.rotation *= Quaternion.Euler(0.0f, rotation * dt, 0.0f);
-        transform.position += transform.forward * translation * dt;
+        moveSpeed *= speeds[(int)type];
+        if (Input.GetMouseButton(1))
+        {
+            float yaw = Input.GetAxis("Mouse X");
+            float sensitivity = 5.0f;
+            transform.Rotate(0.0f, yaw * sensitivity, 0.0f);
+        }
+        transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 }
